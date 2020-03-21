@@ -1,0 +1,76 @@
+jobs:
+  include:
+    # CMS
+    - language: php
+      os: linux
+      dist: bionic
+      services:
+        - docker
+
+      before_install:
+        - cd cms
+
+        # Make file executable (Not by default)
+        - chmod +x ./travis-push-to-docker.sh
+
+        # Login to make sure we have access to private dockers
+        - |
+          if [[ -v DOCKER_PASSWORD && -v DOCKER_USERNAME ]]; then
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          fi
+
+      script:
+        - docker build -t a-design-website-cms .
+
+      after_success:
+        # Upload the build
+        - |
+          if [[ -v DOCKER_PASSWORD && -v DOCKER_USERNAME ]]; then
+            ./travis-push-to-docker.sh
+          fi
+
+    # Frontend
+    - language: node_js
+      os: linux
+      dist: bionic
+      node_js:
+        - stable
+
+      cache:
+        yarn: true
+        directories:
+          - node_modules
+
+      before_install:
+        - cd client
+
+      install:
+        - yarn install
+
+      script:
+        - yarn run test
+        - yarn run build
+
+      deploy:
+        - provider: pages
+          token: $GITHUB_TOKEN
+          on:
+            branch: master
+          skip_cleanup: true
+          local_dir: build
+          repo: Generation-2/a-design-website-client-prod
+          target_branch: master
+          fqdn: a-design-web.generation-2.org
+
+        - provider: pages
+          token: $GITHUB_TOKEN
+          on:
+            branch: develop
+          skip_cleanup: true
+          local_dir: build
+          repo: Generation-2/a-design-website-client-dev
+          target_branch: master
+          fqdn: a-design-dev-web.generation-2.org
+
+notifications:
+  email: false

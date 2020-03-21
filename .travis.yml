@@ -48,8 +48,8 @@ jobs:
         - yarn install
 
       script:
-        - yarn run test
-        - yarn run build
+        - yarn test
+        - yarn build
 
       deploy:
         - provider: pages

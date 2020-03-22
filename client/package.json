@@ -1,6 +1,16 @@
 {
   "name": "a-design-website-frontend",
   "version": "0.1.0",
+  "homepage": "https://a-design-web.generation-2.org",
+  "bugs": {
+    "url": "https://github.com/Generation-2/a-design-website/issues",
+    "email": "manuele.vaccari@gmail.com"
+  },
+  "license": "GPL-3.0-only",
+  "author": {
+    "name": "Manuele Vaccari",
+    "email": "manuele.vaccari@gmail.com"
+  },
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -10,6 +20,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
+    "node-sass": "^4.13.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"

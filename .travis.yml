@@ -46,7 +46,7 @@ jobs:
             branch: master
           cleanup: false
           local_dir: build
-          repo: D3strukt0r/a-design-web-prod-prod
+          repo: D3strukt0r/a-design-web-prod
           target_branch: master
           fqdn: a-design.manuele-vaccari.ch
 
@@ -57,7 +57,7 @@ jobs:
             branch: develop
           cleanup: false
           local_dir: build
-          repo: D3strukt0r/a-design-web-prod-dev
+          repo: D3strukt0r/a-design-web-dev
           target_branch: master
           fqdn: a-design-dev.manuele-vaccari.ch
 

@@ -15,27 +15,28 @@ FROM php:7.4-fpm-alpine AS php
 WORKDIR /app
 
 # Copy all the source files
-COPY config ./config
+# UID and GID is 82 for www-data
+COPY --chown=82:82 config ./config
 RUN mkdir /data/config -p
 RUN touch /data/config/license.key
 RUN ln -sf /data/config/license.key ./config/license.key
 
-COPY modules ./modules
+COPY --chown=82:82 modules ./modules
 
-COPY storage /data/storage
+COPY --chown=82:82 storage /data/storage
 RUN ln -s /data/storage .
 
-COPY templates ./templates
+COPY --chown=82:82 templates ./templates
 
-COPY web ./web
+COPY --chown=82:82 web ./web
 RUN mkdir /data/web
 RUN mv ./web/cpresources /data/web
 RUN ln -s /data/web/cpresources ./web/cpresources
 
-COPY .env.example /data/.env
+COPY --chown=82:82 .env.example /data/.env
 RUN ln -s /data/.env ./.env
 
-COPY craft .
+COPY --chown=82:82 craft .
 
 COPY --from=build /app/vendor ./vendor
 

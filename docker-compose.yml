@@ -7,11 +7,11 @@ services:
       #
       # Copy in our configs
       #
-      - ./docker/charset.cnf:/etc/mysql/conf.d/charset.cnf
+      - ./cms/docker/charset.cnf:/etc/mysql/conf.d/charset.cnf
       #
       # Persist our MySQL data
       #
-      - database3:/var/lib/mysql
+      - database:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: craft
@@ -26,7 +26,7 @@ services:
       #
       # Copy in our PHP config for large uploads.
       #
-      - ./docker/uploads2.ini:/usr/local/etc/php/conf.d/uploads.ini
+      - ./cms/docker/uploads2.ini:/usr/local/etc/php/conf.d/uploads.ini
 
   php:
     build:
@@ -38,12 +38,12 @@ services:
       #
       # Copy in our PHP config for large uploads.
       #
-      - ./docker/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      - ./cms/docker/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
 
-      - ./config/license.key:/data/config/license.key
-      - ./storage:/data/storage
-      - ./web/cpresources:/data/web/cpresources
-      - ./.env:/data/.env
+      - ./cms/config/license.key:/data/config/license.key
+      - ./cms/storage:/data/storage
+      - ./cms/web/cpresources:/data/web/cpresources
+      - ./cms/.env:/data/.env
 
   web:
     build:
@@ -59,9 +59,9 @@ services:
       #
       # Import our Nginx configuration for FPM.
       #
-      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./cms/docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
-      - ./web/cpresources:/data/web/cpresources
+      - ./cms/web/cpresources:/data/web/cpresources
 
 volumes:
-  database3:
+  database:

@@ -1,65 +1,11 @@
-language: shell
+language: php
 os: linux
 dist: bionic
-
-jobs:
-  include:
-    # CMS
-    - language: php
-      os: linux
-      dist: bionic
-      services:
-        - docker
-
-      script:
-        - cd cms
-        # Build and upload
-        - ./travis-push-to-docker.sh
-
-    # Frontend
-    - language: node_js
-      os: linux
-      dist: bionic
-      node_js:
-        - stable
-
-      cache:
-        yarn: true
-        directories:
-          - node_modules
-
-      before_install:
-        - cd client
-
-      install:
-        - yarn install
-
-      script:
-        - yarn test
-        - yarn build
-
-      deploy:
-        - provider: pages:git
-          token: $GITHUB_TOKEN
-          edge: true
-          on:
-            branch: master
-          cleanup: false
-          local_dir: build
-          repo: D3strukt0r/a-design-web-prod
-          target_branch: master
-          fqdn: a-design.manuele-vaccari.ch
-
-        - provider: pages:git
-          token: $GITHUB_TOKEN
-          edge: true
-          on:
-            branch: develop
-          cleanup: false
-          local_dir: build
-          repo: D3strukt0r/a-design-web-dev
-          target_branch: master
-          fqdn: a-design-dev.manuele-vaccari.ch
+services:
+  - docker
 
 notifications:
   email: false
+
+script:
+  - ./travis-push-to-docker.sh

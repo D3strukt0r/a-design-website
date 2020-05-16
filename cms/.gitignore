@@ -101,3 +101,5 @@ fabric.properties
 .idea/**/markdown-navigator/
 
 # End of https://www.gitignore.io/api/dotenv,composer,phpstorm
+
+config/license.key

@@ -11,7 +11,16 @@ fi
 # Build
 REPO_PHP="$DOCKER_USERNAME"/a-design-cms-php
 REPO_PHP_LOCAL=a-design-cms-php
-docker build --target php -t "$REPO_PHP_LOCAL":latest .
+if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+	docker build --target php --build-arg dev="--no-dev" -t "$REPO_PHP_LOCAL":latest .
+elif [[ "$TRAVIS_BRANCH" == "develop" ]]; then
+	docker build --target php --build-arg dev="" -t "$REPO_PHP_LOCAL":latest .
+elif [[ "$TRAVIS_TAG" != "" ]]; then
+	docker build --target php --build-arg dev="--no-dev" -t "$REPO_PHP_LOCAL":latest .
+else
+    echo "Skipping deployment because it's neither master, develop or a versioned tag"
+    exit 0;
+fi
 
 REPO_NGINX="$DOCKER_USERNAME"/a-design-cms-nginx
 REPO_NGINX_LOCAL=a-design-cms-nginx

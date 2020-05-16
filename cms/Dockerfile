@@ -3,9 +3,11 @@
 # -----------
 FROM composer AS build
 
+ARG dev=--no-dev
+
 WORKDIR /app
 COPY . .
-RUN composer install --ignore-platform-reqs --prefer-dist --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-scripts --no-suggest --optimize-autoloader
+RUN composer install --ignore-platform-reqs --prefer-dist --no-ansi ${dev} --no-interaction --no-plugins --no-progress --no-scripts --no-suggest --optimize-autoloader
 
 # ---------
 # PHP stage

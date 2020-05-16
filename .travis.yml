@@ -7,27 +7,10 @@ jobs:
       services:
         - docker
 
-      before_install:
-        - cd cms
-
-        # Make file executable (Not by default)
-        - chmod +x ./travis-push-to-docker.sh
-
-        # Login to make sure we have access to private dockers
-        - |
-          if [[ -v DOCKER_PASSWORD && -v DOCKER_USERNAME ]]; then
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          fi
-
       script:
-        - docker build -t a-design-website-cms .
-
-      after_success:
-        # Upload the build
-        - |
-          if [[ -v DOCKER_PASSWORD && -v DOCKER_USERNAME ]]; then
-            ./travis-push-to-docker.sh
-          fi
+        - cd cms
+        # Build and upload
+        - ./travis-push-to-docker.sh
 
     # Frontend
     - language: node_js

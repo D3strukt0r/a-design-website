@@ -1,3 +1,7 @@
+language: shell
+os: linux
+dist: bionic
+
 jobs:
   include:
     # CMS
@@ -7,27 +11,10 @@ jobs:
       services:
         - docker
 
-      before_install:
-        - cd cms
-
-        # Make file executable (Not by default)
-        - chmod +x ./travis-push-to-docker.sh
-
-        # Login to make sure we have access to private dockers
-        - |
-          if [[ -v DOCKER_PASSWORD && -v DOCKER_USERNAME ]]; then
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          fi
-
       script:
-        - docker build -t a-design-website-cms .
-
-      after_success:
-        # Upload the build
-        - |
-          if [[ -v DOCKER_PASSWORD && -v DOCKER_USERNAME ]]; then
-            ./travis-push-to-docker.sh
-          fi
+        - cd cms
+        # Build and upload
+        - ./travis-push-to-docker.sh
 
     # Frontend
     - language: node_js
@@ -52,25 +39,27 @@ jobs:
         - yarn build
 
       deploy:
-        - provider: pages
+        - provider: pages:git
           token: $GITHUB_TOKEN
+          edge: true
           on:
             branch: master
-          skip_cleanup: true
+          cleanup: false
           local_dir: build
-          repo: Generation-2/a-design-website-client-prod
+          repo: D3strukt0r/a-design-web-prod
           target_branch: master
-          fqdn: a-design-web.generation-2.org
+          fqdn: a-design.manuele-vaccari.ch
 
-        - provider: pages
+        - provider: pages:git
           token: $GITHUB_TOKEN
+          edge: true
           on:
             branch: develop
-          skip_cleanup: true
+          cleanup: false
           local_dir: build
-          repo: Generation-2/a-design-website-client-dev
+          repo: D3strukt0r/a-design-web-dev
           target_branch: master
-          fqdn: a-design-dev-web.generation-2.org
+          fqdn: a-design-dev.manuele-vaccari.ch
 
 notifications:
   email: false

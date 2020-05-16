@@ -1,0 +1,67 @@
+version: '3.4'
+
+services:
+  db:
+    image: mariadb
+    volumes:
+      #
+      # Copy in our configs
+      #
+      - ./docker/charset.cnf:/etc/mysql/conf.d/charset.cnf
+      #
+      # Persist our MySQL data
+      #
+      - database3:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: craft
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8081:80
+    links:
+      - db
+    volumes:
+      #
+      # Copy in our PHP config for large uploads.
+      #
+      - ./docker/uploads2.ini:/usr/local/etc/php/conf.d/uploads.ini
+
+  php:
+    build:
+      context: ./cms
+      target: php
+    links:
+      - db
+    volumes:
+      #
+      # Copy in our PHP config for large uploads.
+      #
+      - ./docker/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+
+      - ./config/license.key:/data/config/license.key
+      - ./storage:/data/storage
+      - ./web/cpresources:/data/web/cpresources
+      - ./.env:/data/.env
+
+  web:
+    build:
+      context: ./cms
+      target: nginx
+    ports:
+      - 8080:80
+    links:
+      - php
+    environment:
+      - HOST=localhost
+    volumes:
+      #
+      # Import our Nginx configuration for FPM.
+      #
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+      - ./web/cpresources:/data/web/cpresources
+
+volumes:
+  database3:

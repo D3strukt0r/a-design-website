@@ -60,7 +60,7 @@ WORKDIR /app
 
 # Copy all the source files
 COPY web ./web
-RUN mkdir /data/web
+RUN mkdir /data/web -p
 RUN mv ./web/cpresources /data/web
 RUN ln -s /data/web/cpresources ./web/cpresources
 

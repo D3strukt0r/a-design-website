@@ -41,9 +41,9 @@ jobs:
             branch: master
           skip_cleanup: true
           local_dir: build
-          repo: Generation-2/a-design-website-client-prod
+          repo: D3strukt0r/a-design-web-prod-prod
           target_branch: master
-          fqdn: a-design-web.generation-2.org
+          fqdn: a-design.manuele-vaccari.ch
 
         - provider: pages
           token: $GITHUB_TOKEN
@@ -51,9 +51,9 @@ jobs:
             branch: develop
           skip_cleanup: true
           local_dir: build
-          repo: Generation-2/a-design-website-client-dev
+          repo: D3strukt0r/a-design-web-prod-dev
           target_branch: master
-          fqdn: a-design-dev-web.generation-2.org
+          fqdn: a-design-dev.manuele-vaccari.ch
 
 notifications:
   email: false

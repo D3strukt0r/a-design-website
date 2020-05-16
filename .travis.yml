@@ -1,3 +1,7 @@
+language: shell
+os: linux
+dist: bionic
+
 jobs:
   include:
     # CMS
@@ -35,21 +39,23 @@ jobs:
         - yarn build
 
       deploy:
-        - provider: pages
+        - provider: pages:git
           token: $GITHUB_TOKEN
+          edge: true
           on:
             branch: master
-          skip_cleanup: true
+          cleanup: false
           local_dir: build
           repo: D3strukt0r/a-design-web-prod-prod
           target_branch: master
           fqdn: a-design.manuele-vaccari.ch
 
-        - provider: pages
+        - provider: pages:git
           token: $GITHUB_TOKEN
+          edge: true
           on:
             branch: develop
-          skip_cleanup: true
+          cleanup: false
           local_dir: build
           repo: D3strukt0r/a-design-web-prod-dev
           target_branch: master

@@ -64,10 +64,10 @@ else \
 	cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
 fi; \
 \
-# For max_accelerated_files find the number of php files (find . -type f -print | grep php | wc -l)
 if [[ "$DEV" == "true" ]]; then \
-	sed -i "s/opcache.validate_timestamps=0/#opcache.validate_timestamps=0/g" opcache.ini; \
+	sed -i "s/opcache.validate_timestamps=0/#opcache.validate_timestamps=0/g" $PHP_INI_DIR/conf.d/opcache.ini; \
 fi
+# TODO: For max_accelerated_files find the number of php files (find . -type f -print | grep php | wc -l)
 
 VOLUME [ "/data" ]
 

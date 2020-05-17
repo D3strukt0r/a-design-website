@@ -1,11 +1,62 @@
 language: php
 os: linux
 dist: bionic
+php: 7.4
 services:
   - docker
 
 notifications:
   email: false
 
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+
+before_script:
+  # Login to make sure we have access to private dockers and can upload to docker
+  - set -ex;
+  - |
+    if [[ -v DOCKER_PASSWORD && -v DOCKER_USERNAME ]]; then
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    fi
+
 script:
-  - ./travis-push-to-docker.sh
+  - |
+    REPO_PHP="$DOCKER_USERNAME"/a-design-cms-php
+    REPO_PHP_LOCAL=a-design-cms-php
+    if [[ "$TRAVIS_BRANCH" == "develop" ]]; then
+        composer install --ignore-platform-reqs --prefer-dist --no-interaction --no-plugins --no-scripts --no-suggest --optimize-autoloader;
+    	docker build --target php --build-arg DEV="true" -t "$REPO_PHP_LOCAL":latest .
+    else
+        composer install --ignore-platform-reqs --prefer-dist --no-dev --no-interaction --no-plugins --no-scripts --no-suggest --optimize-autoloader;
+    	docker build --target php -t "$REPO_PHP_LOCAL":latest .
+    fi
+
+    REPO_NGINX="$DOCKER_USERNAME"/a-design-cms-nginx
+    REPO_NGINX_LOCAL=a-design-cms-nginx
+    docker build --target nginx -t "$REPO_NGINX_LOCAL":latest .
+
+after_success:
+  - |
+    echo "Choosing tag to upload to... (Branch: '$TRAVIS_BRANCH' | Tag: '$TRAVIS_TAG')"
+    if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+        DOCKER_PUSH_TAG=latest
+    elif [[ "$TRAVIS_BRANCH" == "develop" ]]; then
+        DOCKER_PUSH_TAG=nightly
+    elif [[ "$TRAVIS_TAG" != "" ]]; then
+        DOCKER_PUSH_TAG=$TRAVIS_TAG
+    else
+        echo "Skipping deployment because it's neither master, develop or a versioned tag"
+        exit 0;
+    fi
+
+    if [[ -z $DOCKER_PASSWORD || -z $DOCKER_USERNAME ]]; then
+      echo 'Docker credentials are not set'
+      exit 1
+    fi
+
+    docker tag "$REPO_PHP_LOCAL" "$REPO_PHP":"$DOCKER_PUSH_TAG"
+    docker push "$REPO_PHP":"$DOCKER_PUSH_TAG"
+
+    docker tag "$REPO_NGINX_LOCAL" "$REPO_NGINX":"$DOCKER_PUSH_TAG"
+    docker push "$REPO_NGINX":"$DOCKER_PUSH_TAG"

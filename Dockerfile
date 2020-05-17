@@ -1,9 +1,13 @@
+# ----------------------
+# Global build variables
+# ----------------------
+ARG DEV=false
+
 # -----------
 # Build stage
 # -----------
 FROM composer AS build
-
-ARG DEV=false
+ARG DEV
 
 WORKDIR /app
 COPY . .
@@ -18,6 +22,7 @@ fi
 # PHP stage
 # ---------
 FROM php:7.4-fpm-alpine AS php
+ARG DEV
 
 # Copy all the source files
 # UID and GID is 82 for www-data
@@ -51,8 +56,9 @@ ln -s /data/web/cpresources ./web/cpresources; \
 ln -s /data/.env ./.env; \
 \
 # Get all php requirements
+apk update; \
 apk add --no-cache bash zip autoconf g++ imagemagick-dev make libpng-dev libzip-dev icu-dev; \
-docker-php-ext-install pdo_mysql gd zip intl; \
+docker-php-ext-install gd intl opcache pdo_mysql zip ; \
 pecl install imagick; \
 docker-php-ext-enable imagick; \
 \
@@ -62,6 +68,19 @@ apk del autoconf g++ make; \
 \
 # Setup php
 mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
+\
+# For max_accelerated_files find the number of php files (find . -type f -print | grep php | wc -l)
+{ \
+	echo 'opcache.revalidate_freq=0'; \
+	echo 'opcache.max_accelerated_files=6000'; \
+	echo 'opcache.memory_consumption=192'; \
+	echo 'opcache.interned_strings_buffer=16'; \
+	echo 'opcache.fast_shutdown=1'; \
+} > $PHP_INI_DIR/conf.d/opcache-recommended.ini; \
+if [[ "$DEV" != "true" ]]; then \
+	echo 'opcache.validate_timestamps=0' > $PHP_INI_DIR/conf.d/opcache-recommended.ini; \
+fi; \
+\
 { \
 	echo 'max_execution_time = 120'; \
 	echo 'memory_limit = 256M'; \
@@ -77,9 +96,8 @@ CMD ["php-fpm"]
 # -----------
 FROM nginx:1.17-alpine AS nginx
 
-WORKDIR /app
-
 # Copy all the source files
+WORKDIR /app
 COPY web ./web
 
 RUN set -ex; \

@@ -21,7 +21,9 @@ fi
 # ---------
 # PHP stage
 # ---------
-FROM php:7.4-fpm-alpine AS php
+# Uses php:7.4-fpm-alpine
+FROM d3strukt0r/php-craftcms AS php
+
 ARG DEV
 
 # Copy all the source files
@@ -55,36 +57,17 @@ ln -s /data/web/cpresources ./web/cpresources; \
 # Link .env
 ln -s /data/.env ./.env; \
 \
-# Get all php requirements
-apk update; \
-apk add --no-cache bash zip autoconf g++ imagemagick-dev make libpng-dev libzip-dev icu-dev; \
-docker-php-ext-install gd intl opcache pdo_mysql zip ; \
-pecl install imagick; \
-docker-php-ext-enable imagick; \
-\
-# Remove building tools for smaller container size
-rm -rf /tmp/pear; \
-apk del autoconf g++ make; \
-\
 # Setup php
-mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
-\
-# For max_accelerated_files find the number of php files (find . -type f -print | grep php | wc -l)
-{ \
-	echo 'opcache.revalidate_freq=0'; \
-	echo 'opcache.max_accelerated_files=6000'; \
-	echo 'opcache.memory_consumption=192'; \
-	echo 'opcache.interned_strings_buffer=16'; \
-	echo 'opcache.fast_shutdown=1'; \
-} > $PHP_INI_DIR/conf.d/opcache-recommended.ini; \
-if [[ "$DEV" != "true" ]]; then \
-	echo 'opcache.validate_timestamps=0' > $PHP_INI_DIR/conf.d/opcache-recommended.ini; \
+if [[ "$DEV" == "true" ]]; then \
+	cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"; \
+else \
+	cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
 fi; \
 \
-{ \
-	echo 'max_execution_time = 120'; \
-	echo 'memory_limit = 256M'; \
-} > $PHP_INI_DIR/conf.d/misc.ini
+# For max_accelerated_files find the number of php files (find . -type f -print | grep php | wc -l)
+if [[ "$DEV" == "true" ]]; then \
+	sed -i "s/opcache.validate_timestamps=0/#opcache.validate_timestamps=0/g" opcache.ini; \
+fi
 
 VOLUME [ "/data" ]
 

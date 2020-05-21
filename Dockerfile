@@ -1,9 +1,13 @@
+# ----------------------
+# Global build variables
+# ----------------------
+ARG DEV=false
+
 # -----------
 # Build stage
 # -----------
 FROM composer AS build
-
-ARG DEV=false
+ARG DEV
 
 WORKDIR /app
 COPY . .
@@ -17,7 +21,10 @@ fi
 # ---------
 # PHP stage
 # ---------
-FROM php:7.4-fpm-alpine AS php
+# Uses php:7.4-fpm-alpine
+FROM d3strukt0r/php-craftcms AS php
+
+ARG DEV
 
 # Copy all the source files
 # UID and GID is 82 for www-data
@@ -50,22 +57,17 @@ ln -s /data/web/cpresources ./web/cpresources; \
 # Link .env
 ln -s /data/.env ./.env; \
 \
-# Get all php requirements
-apk add --no-cache bash zip autoconf g++ imagemagick-dev make libpng-dev libzip-dev icu-dev; \
-docker-php-ext-install pdo_mysql gd zip intl; \
-pecl install imagick; \
-docker-php-ext-enable imagick; \
-\
-# Remove building tools for smaller container size
-rm -rf /tmp/pear; \
-apk del autoconf g++ make; \
-\
 # Setup php
-mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
-{ \
-	echo 'max_execution_time = 120'; \
-	echo 'memory_limit = 256M'; \
-} > $PHP_INI_DIR/conf.d/misc.ini
+if [[ "$DEV" == "true" ]]; then \
+	cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"; \
+else \
+	cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
+fi; \
+\
+if [[ "$DEV" == "true" ]]; then \
+	sed -i "s/opcache.validate_timestamps=0/#opcache.validate_timestamps=0/g" $PHP_INI_DIR/conf.d/opcache.ini; \
+fi
+# TODO: For max_accelerated_files find the number of php files (find . -type f -print | grep php | wc -l)
 
 VOLUME [ "/data" ]
 
@@ -77,9 +79,8 @@ CMD ["php-fpm"]
 # -----------
 FROM nginx:1.17-alpine AS nginx
 
-WORKDIR /app
-
 # Copy all the source files
+WORKDIR /app
 COPY web ./web
 
 RUN set -ex; \

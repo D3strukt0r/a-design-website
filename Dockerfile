@@ -1,15 +1,13 @@
 # ---------
 # PHP stage
 # ---------
-# Uses php:7.4-fpm-alpine
-FROM d3strukt0r/php-craftcms AS php
+FROM php:7.4-fpm-alpine AS php
 
 ARG DEV=false
 
-COPY bin/php /usr/local/bin
-COPY build/php /build
+COPY docker/bin/php /usr/local/bin
+COPY docker/build/php /build
 COPY . /build/src
-COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 RUN set -eux; \
     apk update; \
@@ -37,8 +35,8 @@ CMD ["php-fpm"]
 # -----------
 FROM nginx:1.17-alpine AS nginx
 
-COPY bin/nginx /usr/local/bin
-COPY build/nginx /build
+COPY docker/bin/nginx /usr/local/bin
+COPY docker/build/nginx /build
 COPY web /app/web
 
 RUN set -eux; \

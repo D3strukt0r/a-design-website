@@ -29,6 +29,8 @@ services:
     build:
       context: .
       target: php
+      args:
+        DEV: "true"
     depends_on:
       - db
     networks:

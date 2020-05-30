@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 
@@ -8,11 +8,35 @@ if [[ $1 != "php-fpm" ]]; then
 	exit
 fi
 
+# Setup php
+if [[ "$DEV" == "true" ]]; then
+	cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+else
+	cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+fi
+
+{
+	echo "opcache.revalidate_freq = 0"
+	if [[ "$DEV" != "true" ]]; then
+		echo "opcache.validate_timestamps = 0"
+	fi
+	echo "opcache.max_accelerated_files = $(find /app -type f -print | grep -c php)"
+	echo "opcache.memory_consumption = 192"
+	echo "opcache.interned_strings_buffer = 16"
+	echo "opcache.fast_shutdown = 1"
+} >"$PHP_INI_DIR/conf.d/opcache.ini"
+
+{
+	echo "max_execution_time = 120"
+	echo "memory_limit = 256M"
+} >"$PHP_INI_DIR/conf.d/misc.ini"
+
 # Add custom upload limit
-if [[ ! -z "${UPLOAD_LIMIT}" ]]; then
-    echo "Adding the custom upload limit."
-    {
+if [[ -n "${UPLOAD_LIMIT}" ]]; then
+	echo "Adding the custom upload limit of $UPLOAD_LIMIT."
+	{
 		echo "upload_max_filesize = $UPLOAD_LIMIT"
+		# TODO: "post_max_size" should be greater than "upload_max_filesize".
 		echo "post_max_size = $UPLOAD_LIMIT"
 	} >"$PHP_INI_DIR/conf.d/upload-limit.ini"
 fi
@@ -43,18 +67,5 @@ if [[ ! -d /data/web/cpresources ]]; then
 	cp /skeleton/web/cpresources /data/web
 fi
 ln -sf /data/web/cpresources ./web/cpresources
-
-# Setup php
-if [[ "$DEV" == "true" ]]; then
-	cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
-else
-	cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-fi
-
-if [[ "$DEV" == "true" ]]; then
-	sed -i "s/opcache.validate_timestamps=0/#opcache.validate_timestamps=0/g" $PHP_INI_DIR/conf.d/opcache.ini
-fi
-# TODO: For max_accelerated_files find the number of php files (find . -type f -print | grep php | wc -l)
-
 
 exec "$@"

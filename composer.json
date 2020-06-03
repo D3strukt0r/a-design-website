@@ -1,26 +1,38 @@
 {
-  "require": {
-    "craftcms/cms": "^3.4.0",
-    "vlucas/phpdotenv": "^3.4.0"
-  },
-  "require-dev": {
-    "yiisoft/yii2-shell": "^2.0.3"
-  },
-  "autoload": {
-    "psr-4": {
-      "modules\\": "modules/"
+    "name": "a-design/cms",
+    "description": "CMS system for a-design",
+    "type": "project",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Manuele Vaccari",
+            "email": "manuele.vaccari@gmail.com",
+            "homepage": "https://github.com/D3strukt0r",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.4.0",
+        "vlucas/phpdotenv": "^3.4.0"
+    },
+    "require-dev": {
+        "yiisoft/yii2-shell": "^2.0.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "modules\\": "modules/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "platform": {
+            "php": "7.0"
+        }
+    },
+    "scripts": {
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ]
     }
-  },
-  "config": {
-    "sort-packages": true,
-    "optimize-autoloader": true,
-    "platform": {
-      "php": "7.0"
-    }
-  },
-  "scripts": {
-    "post-root-package-install": [
-      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
-    ]
-  }
 }

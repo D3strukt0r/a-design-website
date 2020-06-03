@@ -1,7 +1,12 @@
 language: php
 os: linux
 dist: bionic
-php: 7.4
+php:
+  - 7.1
+  - 7.2
+  - 7.3
+  - 7.4
+
 services:
   - docker
 
@@ -12,5 +17,13 @@ cache:
   directories:
     - $HOME/.composer/cache/files
 
+install:
+  - rm composer.lock
+  # https://stackoverflow.com/questions/51341463/unable-to-change-travis-ci-php-memory-limit/51381888#comment89735616_51381888
+  - COMPOSER_MEMORY_LIMIT=-1 composer install
+
 script:
-  - ./build/travis.sh
+  - echo "Tests should be running in here ..."
+
+after_success:
+  - if [[ "$TRAVIS_PHP_VERSION" == "7.4" ]]; then ./docker/build/travis.sh; fi

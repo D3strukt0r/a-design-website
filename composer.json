@@ -13,7 +13,7 @@
     ],
     "require": {
         "craftcms/cms": "^3.4.0",
-        "vlucas/phpdotenv": "^3.4.0"
+        "vlucas/phpdotenv": "^4.1.8"
     },
     "require-dev": {
         "yiisoft/yii2-shell": "^2.0.3"

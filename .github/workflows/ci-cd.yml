@@ -64,6 +64,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '${{ matrix.php }}'
+          tools: pecl
           coverage: none
 
       - name: Setup PHP with xdebug
@@ -71,6 +72,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '${{ matrix.php }}'
+          tools: pecl
           coverage: xdebug
 
       - name: Show version and environment information

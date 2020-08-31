@@ -46,7 +46,6 @@ jobs:
       postgres:
         image: postgres
         ports:
-          # Maps tcp port 5432 on service container to the host
           - 5432
         env:
           POSTGRES_PASSWORD: postgres
@@ -71,11 +70,11 @@ jobs:
 
       - name: Create MySQL test database
         run: |
-          mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} --user=root --password=mysql -e 'CREATE DATABASE `craft-test`;'
-          mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} --user=root --password=mysql -e "SET GLOBAL sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';"
+          mysql --host=127.0.0.1 --port=${{ job.services.mysql.ports['3306'] }} --user=root --password=mysql -e 'CREATE DATABASE `craft-test`;'
+          mysql --host=127.0.0.1 --port=${{ job.services.mysql.ports['3306'] }} --user=root --password=mysql -e "SET GLOBAL sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';"
 
       - name: Create Postgres test database
-        run: psql -U postgres -c 'CREATE DATABASE "craft-test";'
+        run: PGPASSWORD=postgres psql --host=127.0.0.1 --port=${{ job.services.postgres.ports['5432'] }} --username=postgres -c 'CREATE DATABASE "craft-test";'
 
       - name: Install imagick
         run: |

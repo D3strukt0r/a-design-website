@@ -66,8 +66,8 @@ jobs:
 
       - name: Create MySQL test database
         run: |
-          mysql -e 'CREATE DATABASE `craft-test`;'
-          mysql -e "SET GLOBAL sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';"
+          mysql --host=mariadb --password=mysql -e 'CREATE DATABASE `craft-test`;'
+          mysql --host=mariadb --password=mysql -e "SET GLOBAL sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';"
 
       - name: Create Postgres test database
         run: psql -U postgres -c 'CREATE DATABASE "craft-test";'

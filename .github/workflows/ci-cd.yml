@@ -59,6 +59,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Setup PHP
+        if: matrix.TASK_TESTS_COVERAGE != 1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '${{ matrix.php }}'
+          coverage: none
+
+      - name: Setup PHP with xdebug
+        if: matrix.TASK_TESTS_COVERAGE == 1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '${{ matrix.php }}'
+          coverage: xdebug
+
       - name: Show version and environment information
         run: |
           php --version

@@ -85,6 +85,9 @@
       <path value="$PROJECT_DIR$/vendor/voku/portable-utf8" />
       <path value="$PROJECT_DIR$/vendor/voku/portable-ascii" />
       <path value="$PROJECT_DIR$/vendor/voku/urlify" />
+      <path value="$PROJECT_DIR$/vendor/defuse/php-encryption" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/diff" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php70" />
     </include_path>
   </component>
 </project>

@@ -75,6 +75,9 @@ jobs:
           tools: pecl
           coverage: xdebug
 
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
       - name: Show version and environment information
         run: |
           php --version
@@ -94,6 +97,8 @@ jobs:
 
       - name: Install imagick
         run: |
+          sudo apt-get update -y
+          sudo apt-get install -y php-pear
           pear config-set preferred_state beta
           pecl channel-update pecl.php.net
           yes | pecl install imagick

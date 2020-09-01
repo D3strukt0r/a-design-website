@@ -1,0 +1,22 @@
+dateModified: 1598987123
+email:
+  fromEmail: info@a-design.ch
+  fromName: a-design
+  transportType: craft\mail\transportadapters\Sendmail
+plugins:
+  commerce:
+    edition: lite
+    enabled: true
+    schemaVersion: 3.2.3
+system:
+  edition: pro
+  live: true
+  name: a-design
+  schemaVersion: 3.5.13
+  timeZone: America/Los_Angeles
+users:
+  allowPublicRegistration: false
+  defaultGroup: null
+  photoSubpath: null
+  photoVolumeUid: null
+  requireEmailVerification: true

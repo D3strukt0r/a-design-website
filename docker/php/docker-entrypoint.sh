@@ -28,7 +28,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
 
     echo 'Waiting for db to be ready...'
     ATTEMPTS_LEFT_TO_REACH_DATABASE=60
-    until [ $ATTEMPTS_LEFT_TO_REACH_DATABASE -eq 0 ] || mysql --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" --password="$DB_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; do
+    until [ $ATTEMPTS_LEFT_TO_REACH_DATABASE -eq 0 ] || mysql --host="$DB_SERVER" --port="$DB_PORT" --user="$DB_USER" --password="$DB_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; do
         sleep 1
         ATTEMPTS_LEFT_TO_REACH_DATABASE=$((ATTEMPTS_LEFT_TO_REACH_DATABASE - 1))
         echo "Still waiting for db to be ready... Or maybe the db is not reachable. $ATTEMPTS_LEFT_TO_REACH_DATABASE attempts left"

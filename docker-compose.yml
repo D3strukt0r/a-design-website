@@ -14,17 +14,6 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: craft
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    depends_on:
-      - db
-    networks:
-      - internal
-    ports:
-      - 8081:80
-    environment:
-      UPLOAD_LIMIT: 100M
-
   php:
     build:
       context: .
@@ -37,12 +26,13 @@ services:
       - .:/app:rw,cached
     environment:
       ENVIRONMENT: dev
-      SECURITY_KEY: vrjqathp839q4hjtvio3qpjt438
-      DB_HOST: db
-      DB_DSN: mysql:host=db;port=3306;dbname=craft
+      APP_ID: "CraftCMS--!justfordev!"
+      SECURITY_KEY: "!justfordev!"
+      DB_SERVER: db
       DB_USER: root
       DB_PASSWORD: password
-      DEFAULT_SITE_URL: http://localhost:8080
+      DB_DATABASE: craft
+      DEFAULT_SITE_URL: http://localhost
 
   web:
     build:
@@ -53,9 +43,7 @@ services:
     networks:
       - internal
     ports:
-      - 8080:80
-    environment:
-      NGINX_CLIENT_MAX_BODY_SIZE: 100M
+      - 80:80
     volumes:
       - ./web/cpresources:/app/web/cpresources:ro
 

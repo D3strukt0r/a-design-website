@@ -22,22 +22,28 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
     # Important for upload limit. 'post_max_size' has to be larger than 'upload_max_filesize'
     PHP_POST_MAX_SIZE=100M \
     PHP_UPLOAD_MAX_FILESIZE=100M \
-    # The environment Craft is currently running in ('dev', 'staging', 'production', etc.)
+    # The environment Craft is currently running in (dev, staging, production, etc.)
     ENVIRONMENT=prod \
+    # The application ID used to to uniquely store session and cache data, mutex locks, and more
+    APP_ID=CraftCMS \
     # The secure key Craft will use for hashing and encrypting data
     SECURITY_KEY= \
-    # The Data Source Name (“DSN”) that tells Craft how to connect to the database
-    DB_DSN=mysql:host=localhost;port=3306;dbname= \
-    # Required seperately to test for stable connection
-    DB_HOST=localhost \
+    # The database driver that will be used (mysql or pgsql)
+    DB_DRIVER=mysql \
+    # The database server name or IP address
+    DB_SERVER=localhost \
+    # The port to connect to the database with
     DB_PORT=3306 \
+    # The name of the database to select
+    DB_DATABASE= \
     # The database username to connect with
     DB_USER=root \
     # The database password to connect with
     DB_PASSWORD= \
     # The database schema that will be used (PostgreSQL only)
     DB_SCHEMA=public \
-    # The prefix that should be added to generated table names (only necessary if multiple things are sharing the same database)
+    # The prefix that should be added to generated table names (only necessary if multiple
+    # things are sharing the same database)
     DB_TABLE_PREFIX= \
     DEFAULT_SITE_URL=
 
@@ -51,7 +57,8 @@ RUN set -eux; \
     \
     apk update; \
     apk add --no-cache \
-        # Alpine package for "imagemagick" contains ~120 .so files, see: https://github.com/docker-library/wordpress/pull/497
+        # Alpine package for "imagemagick" contains ~120 .so files,
+        # see: https://github.com/docker-library/wordpress/pull/497
         imagemagick \
         # Required to check connectivity
         mysql-client \
@@ -61,11 +68,17 @@ RUN set -eux; \
     # Get all php requirements
     apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
+        # For gd
         freetype-dev \
         libjpeg-turbo-dev \
         libpng-dev \
+        # For intl
         icu-dev \
+        # For soap
+        libxml2-dev \
+        # For zip
         libzip-dev \
+        # For imagick
         imagemagick-dev; \
     docker-php-ext-configure gd --with-freetype --with-jpeg >/dev/null; \
     docker-php-ext-install -j "$(nproc)" \
@@ -73,6 +86,7 @@ RUN set -eux; \
         intl \
         opcache \
         pdo_mysql \
+        soap \
         zip \
         >/dev/null; \
     pecl install imagick >/dev/null; \

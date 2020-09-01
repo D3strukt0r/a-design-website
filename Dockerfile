@@ -17,6 +17,7 @@ ARG APCU_VERSION=5.1.18
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1 \
     PATH="${PATH}:/root/.composer/vendor/bin" \
+    PHP_MAX_EXECUTION_TIME=120 \
     # 'memory_limit' has to be larger than 'post_max_size' and 'upload_max_filesize'
     PHP_MEMORY_LIMIT=256M \
     # Important for upload limit. 'post_max_size' has to be larger than 'upload_max_filesize'

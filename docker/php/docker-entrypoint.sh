@@ -57,7 +57,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
         echo 'date.timezone = UTC'
         echo 'session.auto_start = Off'
         echo 'short_open_tag = Off'
-        echo 'max_execution_time = 120'
+        echo "max_execution_time = $PHP_MAX_EXECUTION_TIME"
         echo "memory_limit = $PHP_MEMORY_LIMIT"
     } >"$PHP_INI_DIR/conf.d/misc.ini"
 

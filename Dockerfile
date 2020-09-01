@@ -110,6 +110,7 @@ RUN set -eux; \
     # Remove building tools for smaller container size
     apk del .build-deps; \
     \
+    # Set default php configuration
     ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini; \
     \
     # prevent the reinstallation of vendors at every changes in the source code
@@ -123,8 +124,11 @@ RUN set -eux; \
 
 VOLUME ["/data"]
 
-COPY docker/php/docker-healthcheck.sh /usr/local/bin/docker-healthcheck
-HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
+# https://github.com/renatomefi/php-fpm-healthcheck
+RUN wget -O /usr/local/bin/php-fpm-healthcheck https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck; \
+    chmod +x /usr/local/bin/php-fpm-healthcheck; \
+    echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["php-fpm-healthcheck"]
 
 COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 ENTRYPOINT ["docker-entrypoint"]

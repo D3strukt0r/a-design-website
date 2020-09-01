@@ -8,6 +8,8 @@
  * @see \craft\config\GeneralConfig
  */
 
+use craft\helpers\App;
+
 return [
     // Global settings
     '*' => [
@@ -17,15 +19,11 @@ return [
         // Whether generated URLs should omit "index.php"
         'omitScriptNameInUrls' => true,
 
-        // Control Panel trigger word
+        // Control panel trigger word
         'cpTrigger' => 'admin',
 
         // The secure key Craft will use for hashing and encrypting data
-        'securityKey' => getenv('SECURITY_KEY'),
-
-        // Whether to save the project config out to config/project.yaml
-        // (see https://docs.craftcms.com/v3/project-config.html)
-        'useProjectConfigFile' => false,
+        'securityKey' => App::env('SECURITY_KEY'),
     ],
 
     // Dev environment settings

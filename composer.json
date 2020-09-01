@@ -13,7 +13,8 @@
     ],
     "require": {
         "craftcms/cms": "^3.5",
-        "vlucas/phpdotenv": "^4.1"
+        "craftcms/commerce": "3.2.3",
+        "vlucas/phpdotenv": "^3.4"
     },
     "require-dev": {
         "codeception/codeception": "^4.1",
@@ -29,10 +30,7 @@
     },
     "config": {
         "sort-packages": true,
-        "optimize-autoloader": true,
-        "platform": {
-            "php": "7.0"
-        }
+        "optimize-autoloader": true
     },
     "scripts": {
         "post-root-package-install": [

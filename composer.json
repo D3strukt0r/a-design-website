@@ -12,10 +12,14 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.4.0",
-        "vlucas/phpdotenv": "^3.4.0"
+        "craftcms/cms": "^3.5",
+        "vlucas/phpdotenv": "^4.1"
     },
     "require-dev": {
+        "codeception/codeception": "^4.1",
+        "codeception/module-asserts": "^1.0.0",
+        "codeception/module-phpbrowser": "^1.0.0",
+        "codeception/module-yii2": "^1.1",
         "yiisoft/yii2-shell": "^2.0.3"
     },
     "autoload": {

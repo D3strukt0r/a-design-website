@@ -1,0 +1,80 @@
+version: "3.4"
+
+services:
+  db:
+    image: mariadb
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    networks:
+      - internal
+    volumes:
+      - database:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: craft-test
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
+    networks:
+      - internal
+    ports:
+      - 8081:80
+    environment:
+      UPLOAD_LIMIT: 100M
+
+  php:
+    build:
+      context: .
+      target: php
+      args:
+        DEV: "true"
+    depends_on:
+      - db
+    networks:
+      - internal
+    volumes:
+      - ./config/license.key:/data/config/license.key
+      - ./storage:/data/storage
+      - ./web/cpresources:/data/web/cpresources
+    environment:
+      UPLOAD_LIMIT: 100M
+      # The environment Craft is currently running in ('dev', 'staging', 'production', etc.)
+      ENVIRONMENT: dev
+      # The secure key Craft will use for hashing and encrypting data
+      SECURITY_KEY: vrjqathp839q4hjtvio3qpjt438
+      # The Data Source Name (“DSN”) that tells Craft how to connect to the database
+      DB_DSN: mysql:host=db;port=3306;dbname=craft
+      # The database username to connect with
+      DB_USER: root
+      # The database password to connect with
+      DB_PASSWORD: password
+      # The database schema that will be used (PostgreSQL only)
+      DB_SCHEMA: public
+      # The prefix that should be added to generated table names (only necessary if multiple things are sharing the same database)
+      DB_TABLE_PREFIX: ""
+      DEFAULT_SITE_URL: http://localhost:8080
+
+  web:
+    build:
+      context: .
+      target: nginx
+    depends_on:
+      - php
+    networks:
+      - internal
+    ports:
+      - 8080:80
+    environment:
+      UPLOAD_LIMIT: 100M
+    volumes:
+      - ./web/cpresources:/data/web/cpresources
+
+networks:
+  internal:
+    external: false
+
+volumes:
+  database:

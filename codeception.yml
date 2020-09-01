@@ -12,7 +12,7 @@ modules:
   config:
     \craft\test\Craft:
       configFile: "tests/_craft/config/test.php"
-      entryUrl: "https://localhost/index.php"
+      entryUrl: "http://localhost/index.php"
       projectConfig: {}
       migrations: []
       plugins: []

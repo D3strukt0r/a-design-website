@@ -22,7 +22,12 @@
 .php_cs.cache
 .github/
 .idea/
-storage/
+storage/backups
+storage/composer-backups
+storage/config-backups
+storage/config-deltas
+storage/logs
+storage/runtime
 vendor/
 web/cpresources
 web/web.config

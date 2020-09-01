@@ -25,6 +25,7 @@ services:
     volumes:
       - .:/app:rw,cached
     environment:
+      PHP_MAX_EXECUTION_TIME: 0
       ENVIRONMENT: dev
       APP_ID: "CraftCMS--!justfordev!"
       SECURITY_KEY: "!justfordev!"

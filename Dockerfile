@@ -127,7 +127,7 @@ VOLUME ["/data"]
 # https://github.com/renatomefi/php-fpm-healthcheck
 RUN wget -O /usr/local/bin/php-fpm-healthcheck https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck; \
     chmod +x /usr/local/bin/php-fpm-healthcheck; \
-    echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+    echo 'pm.status_path = /status' >> /usr/local/etc/php-fpm.d/zz-docker.conf
 HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["php-fpm-healthcheck"]
 
 COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
@@ -160,8 +160,7 @@ RUN set -eux; \
 
 VOLUME ["/data"]
 
-COPY docker/nginx/docker-healthcheck.sh /usr/local/bin/docker-healthcheck
-HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["test", "-e", "/var/run/nginx.pid", "||", "exit", "1"]
 
 COPY docker/nginx/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 ENTRYPOINT ["docker-entrypoint"]

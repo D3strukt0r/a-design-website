@@ -23,7 +23,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
     fi
 
     if [ "$ENVIRONMENT" != 'prod' ]; then
-        composer install --prefer-dist --no-interaction --no-plugins --no-scripts --no-progress --no-suggest --optimize-autoloader
+        composer install --prefer-dist --no-interaction --no-plugins --no-scripts --no-progress --no-suggest
     fi
 
     echo 'Waiting for db to be ready...'

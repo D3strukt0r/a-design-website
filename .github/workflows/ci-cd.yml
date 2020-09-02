@@ -33,9 +33,10 @@ jobs:
     services:
       mysql:
         image: mysql:5.7
-        ports:
-          - 3306
+        # ports:
+        #   - 3306
         env:
+          MYSQL_DATABASE: test
           MYSQL_ROOT_PASSWORD: mysql
         options: >-
           --health-cmd "mysqladmin ping"
@@ -45,9 +46,10 @@ jobs:
 
       postgres:
         image: postgres
-        ports:
-          - 5432
+        # ports:
+        #   - 5432
         env:
+          POSTGRES_DB: test
           POSTGRES_PASSWORD: postgres
         options: >-
           --health-cmd pg_isready
@@ -89,11 +91,14 @@ jobs:
 
       - name: Create MySQL test database
         run: |
-          mysql --host=127.0.0.1 --port=${{ job.services.mysql.ports['3306'] }} --user=root --password=mysql -e 'CREATE DATABASE `craft-test`;'
-          mysql --host=127.0.0.1 --port=${{ job.services.mysql.ports['3306'] }} --user=root --password=mysql -e "SET GLOBAL sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';"
+          # mysql --host=127.0.0.1 --port=${{ job.services.mysql.ports['3306'] }} --user=root --password=mysql -e 'CREATE DATABASE `craft-test`;'
+          # mysql --host=127.0.0.1 --port=${{ job.services.mysql.ports['3306'] }} --user=root --password=mysql -e "SET GLOBAL sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';"
+          mysql --host=mysql --password=mysql -e 'CREATE DATABASE `craft-test`;'
+          mysql --host=mysql --password=mysql -e "SET GLOBAL sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';"
 
       - name: Create Postgres test database
-        run: PGPASSWORD=postgres psql --host=127.0.0.1 --port=${{ job.services.postgres.ports['5432'] }} --username=postgres -c 'CREATE DATABASE "craft-test";'
+        # run: PGPASSWORD=postgres psql --host=127.0.0.1 --port=${{ job.services.postgres.ports['5432'] }} --username=postgres -c 'CREATE DATABASE "craft-test";'
+        run: PGPASSWORD=postgres psql --host=postgres --username=postgres -c 'CREATE DATABASE "craft-test";'
 
       - name: Copy environment variables
         run: cp tests/.env.example.${{ matrix.db }} tests/.env
@@ -112,6 +117,25 @@ jobs:
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-plugins --no-scripts --no-progress --no-suggest
+
+      - name: Setup environment variables for test with mysql
+        run: |
+          echo "::set-env name=DB_DRIVER::mysql"
+          # echo "::set-env name=DB_SERVER::127.0.0.1"
+          echo "::set-env name=DB_SERVER::mysql"
+          echo "::set-env name=DB_USER::root"
+          echo "::set-env name=DB_PASSWORD::mysql"
+          echo "::set-env name=DB_DATABASE::test"
+
+      - name: Setup environment variables for test with pgsql
+        run: |
+          echo "::set-env name=DB_DRIVER::pgsql"
+          # echo "::set-env name=DB_SERVER::127.0.0.1"
+          echo "::set-env name=DB_SERVER::postgres"
+          echo "::set-env name=DB_USER::postgres"
+          echo "::set-env name=DB_PASSWORD::postgres"
+          echo "::set-env name=DB_DATABASE::test"
+
 
       - name: Run tests
         if: matrix.TASK_TESTS_COVERAGE != 1

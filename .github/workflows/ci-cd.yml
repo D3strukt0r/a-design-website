@@ -119,6 +119,7 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-plugins --no-scripts --no-progress --no-suggest
 
       - name: Setup environment variables for test with mysql
+        if: matrix.db == 'mysql'
         run: |
           echo "::set-env name=DB_DRIVER::mysql"
           # echo "::set-env name=DB_SERVER::127.0.0.1"
@@ -128,6 +129,7 @@ jobs:
           echo "::set-env name=DB_DATABASE::test"
 
       - name: Setup environment variables for test with pgsql
+        if: matrix.db == 'pgsql'
         run: |
           echo "::set-env name=DB_DRIVER::pgsql"
           # echo "::set-env name=DB_SERVER::127.0.0.1"

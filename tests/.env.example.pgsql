@@ -2,7 +2,7 @@
 SECURITY_KEY=
 
 # The database driver that will be used (mysql or pgsql)
-DB_DRIVER=mysql
+DB_DRIVER=pgsql
 
 # The database server name or IP address
 DB_SERVER=127.0.0.1

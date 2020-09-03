@@ -2,17 +2,14 @@ version: "3.4"
 
 services:
   db:
-    image: mariadb
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
+    image: postgres
     networks:
       - internal
     volumes:
-      - database-mysql:/var/lib/mysql
+      - database-pgsql:/var/lib/postgresql/data
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: craft
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: craft
 
   php:
     build:
@@ -29,9 +26,9 @@ services:
       ENVIRONMENT: dev
       APP_ID: "CraftCMS--!justfordev!"
       SECURITY_KEY: "!justfordev!"
-      DB_DRIVER: mysql
+      DB_DRIVER: pgsql
       DB_SERVER: db
-      DB_USER: root
+      DB_USER: postgres
       DB_PASSWORD: password
       DB_DATABASE: craft
       DEFAULT_SITE_URL: http://localhost
@@ -54,4 +51,4 @@ networks:
     external: false
 
 volumes:
-  database-mysql:
+  database-pgsql:

@@ -32,9 +32,9 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
     # The database driver that will be used (mysql or pgsql)
     DB_DRIVER=mysql \
     # The database server name or IP address
-    DB_SERVER=localhost \
+    DB_SERVER=db \
     # The port to connect to the database with
-    DB_PORT=3306 \
+    DB_PORT= \
     # The name of the database to select
     DB_DATABASE= \
     # The database username to connect with
@@ -63,6 +63,7 @@ RUN set -eux; \
         imagemagick \
         # Required to check connectivity
         mysql-client \
+        postgresql-client \
         # Required for healthcheck
         fcgi; \
     \
@@ -75,6 +76,8 @@ RUN set -eux; \
         libpng-dev \
         # For intl
         icu-dev \
+        # For pdo_pgsql
+        postgresql-dev \
         # For soap
         libxml2-dev \
         # For zip
@@ -87,6 +90,7 @@ RUN set -eux; \
         intl \
         opcache \
         pdo_mysql \
+        pdo_pgsql \
         soap \
         zip \
         >/dev/null; \

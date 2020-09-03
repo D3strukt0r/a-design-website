@@ -81,6 +81,9 @@ jobs:
       - name: Setup problem matchers for PHP
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
+      - name: PgSQL extension available?
+        run: php -r "if (extension_loaded('pdo_pgsql')) { echo 'pdo_pgsql available'; } else { echo 'pdo_pgsql NOT available'; }"
+
       - name: Show version and environment information
         run: |
           php --version

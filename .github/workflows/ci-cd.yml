@@ -100,8 +100,8 @@ jobs:
         if: matrix.db == 'mysql'
         run: mysql --host="$DB_SERVER" --port="$DB_PORT" --user="$DB_USER" --password="$DB_PASSWORD" -e "SET GLOBAL sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';"
 
-      # - name: Copy environment variables
-      #   run: cp tests/.env.example.${{ matrix.db }} tests/.env
+      - name: Copy environment variables
+        run: cp tests/.env.example.${{ matrix.db }} tests/.env
 
       # https://github.com/actions/cache/blob/main/examples.md#php---composer
       - name: Get Composer Cache Directory

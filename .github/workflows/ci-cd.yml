@@ -25,7 +25,8 @@ jobs:
       fail-fast: false
       matrix:
         php: [7.3, 7.4]
-        db: [mysql, pgsql]
+        # db: [mysql, pgsql]
+        db: [mysql]
         include:
           - php: 7.4
             db: mysql
@@ -187,17 +188,8 @@ jobs:
           echo "DOCKER_VERSION=$DOCKER_VERSION"
           echo "::set-env name=DOCKER_VERSION::$DOCKER_VERSION"
 
-      - name: Build PHP image (Development)
-        if: github.ref != 'refs/heads/master'
-        run: |
-          composer install --ignore-platform-reqs --prefer-dist --no-interaction --no-plugins --no-scripts --no-suggest --optimize-autoloader
-          docker build . --file Dockerfile --tag $IMAGE_NAME_PHP --target php --build-arg DEV="true"
-
-      - name: Build PHP image (Production)
-        if: github.ref == 'refs/heads/master'
-        run: |
-          composer install --ignore-platform-reqs --prefer-dist --no-dev --no-interaction --no-plugins --no-scripts --no-suggest --optimize-autoloader
-          docker build . --file Dockerfile --tag $IMAGE_NAME_PHP --target php
+      - name: Build PHP image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME_PHP --target php
 
       - name: Build Nginx image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME_NGINX --target nginx

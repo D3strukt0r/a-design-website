@@ -33,7 +33,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mariadb
         ports:
           - 3306
         env:
@@ -70,7 +70,7 @@ jobs:
           extensions: imagick
           coverage: none
 
-      - name: Setup PHP with xdebug
+      - name: Setup PHP with Xdebug
         if: matrix.TASK_TESTS_COVERAGE == 1
         uses: shivammathur/setup-php@v2
         with:
@@ -83,20 +83,40 @@ jobs:
 
       - name: Show version and environment information
         run: |
+          echo "===== PHP ====="
           php --version
+          echo "===== Composer ====="
           composer --version
+          echo "===== INTL ====="
           php -r "echo INTL_ICU_VERSION . \"\n\";"
           php -r "echo INTL_ICU_DATA_VERSION . \"\n\";"
+          echo "===== PostgreSQL ====="
           psql --version
+          echo "===== MySQL ====="
           mysql --version
+
+      - name: Setup environment variables
+        run: |
+          echo "::set-env name=DB_SERVER::127.0.0.1"
+          echo "::set-env name=DB_PASSWORD::password"
+          echo "::set-env name=DB_DATABASE::tests"
+          if [ "${{ matrix.db }}" == 'mysql' ]; then
+              echo "::set-env name=DB_DRIVER::mysql"
+              echo "::set-env name=DB_PORT::${{ job.services.mysql.ports['3306'] }}"
+              echo "::set-env name=DB_USER::root"
+          elif [ "${{ matrix.db }}" == 'pgsql' ]; then
+              echo "::set-env name=DB_DRIVER::pgsql"
+              echo "::set-env name=DB_PORT::${{ job.services.postgres.ports['5432'] }}"
+              echo "::set-env name=DB_USER::postgres"
+          fi
 
       - name: Create MySQL test database
         run: |
-          mysql --host=127.0.0.1 --port=${{ job.services.mysql.ports['3306'] }} --user=root --password=password -e 'CREATE DATABASE `tests`;'
-          mysql --host=127.0.0.1 --port=${{ job.services.mysql.ports['3306'] }} --user=root --password=password -e "SET GLOBAL sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';"
+          mysql --host="$DB_SERVER" --port="$DB_PORT" --user="$DB_USER" --password="$DB_PASSWORD" -e "CREATE DATABASE `$DB_DATABASE`;"
+          mysql --host="$DB_SERVER" --port="$DB_PORT" --user="$DB_USER" --password="$DB_PASSWORD" -e "SET GLOBAL sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';"
 
       - name: Create Postgres test database
-        run: PGPASSWORD=password psql --host=127.0.0.1 --port=${{ job.services.postgres.ports['5432'] }} --username=postgres -c 'CREATE DATABASE "tests";'
+        run: PGPASSWORD="$DB_PASSWORD" psql --host="$DB_SERVER" --port="$DB_PORT" --username="$DB_USER" -c "CREATE DATABASE \"$DB_DATABASE\";"
 
       - name: Copy environment variables
         run: cp tests/.env.example.${{ matrix.db }} tests/.env
@@ -115,26 +135,6 @@ jobs:
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-plugins --no-scripts --no-progress --no-suggest
-
-      - name: Setup environment variables for test with mysql
-        if: matrix.db == 'mysql'
-        run: |
-          echo "::set-env name=DB_DRIVER::mysql"
-          echo "::set-env name=DB_SERVER::127.0.0.1"
-          echo "::set-env name=DB_PORT::${{ job.services.mysql.ports['3306'] }}"
-          echo "::set-env name=DB_USER::root"
-          echo "::set-env name=DB_PASSWORD::password"
-          echo "::set-env name=DB_DATABASE::tests"
-
-      - name: Setup environment variables for test with pgsql
-        if: matrix.db == 'pgsql'
-        run: |
-          echo "::set-env name=DB_DRIVER::pgsql"
-          echo "::set-env name=DB_SERVER::127.0.0.1"
-          echo "::set-env name=DB_PORT::${{ job.services.postgres.ports['5432'] }}"
-          echo "::set-env name=DB_USER::postgres"
-          echo "::set-env name=DB_PASSWORD::password"
-          echo "::set-env name=DB_DATABASE::tests"
 
       - name: Run tests
         if: matrix.TASK_TESTS_COVERAGE != 1

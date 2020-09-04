@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [7.3, 7.4]
+        php: [7.1, 7.2, 7.3, 7.4]
         # db: [mysql, pgsql]
         db: [mysql]
         include:
@@ -68,11 +68,11 @@ jobs:
           echo "::set-env name=DB_SERVER::127.0.0.1"
           echo "::set-env name=DB_PASSWORD::password"
           echo "::set-env name=DB_DATABASE::test"
-          if [ "${{ matrix.db }}" == 'mysql' ]; then
+          if [ "${{ matrix.db }}" = 'mysql' ]; then
               echo "::set-env name=DB_DRIVER::mysql"
               echo "::set-env name=DB_PORT::${{ job.services.mysql.ports['3306'] }}"
               echo "::set-env name=DB_USER::root"
-          elif [ "${{ matrix.db }}" == 'pgsql' ]; then
+          elif [ "${{ matrix.db }}" = 'pgsql' ]; then
               echo "::set-env name=DB_DRIVER::pgsql"
               echo "::set-env name=DB_PORT::${{ job.services.postgres.ports['5432'] }}"
               echo "::set-env name=DB_USER::postgres"
@@ -82,7 +82,7 @@ jobs:
         if: matrix.test_with_coverage != 1
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '${{ matrix.php }}'
+          php-version: "${{ matrix.php }}"
           extensions: imagick
           coverage: none
 
@@ -90,7 +90,7 @@ jobs:
         if: matrix.test_with_coverage == 1
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '${{ matrix.php }}'
+          php-version: "${{ matrix.php }}"
           extensions: imagick
           coverage: xdebug
 
@@ -116,6 +116,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
+      # To run on older php version
+      - name: Remove composer.lock
+        run: rm composer.lock
+
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-plugins --no-scripts --no-progress --no-suggest
 
@@ -133,10 +137,10 @@ jobs:
       - name: Run test build
         run: |
           if [ -f docker-compose.test.yml ]; then
-            docker-compose --file docker-compose.test.yml build
-            docker-compose --file docker-compose.test.yml run sut
+              docker-compose --file docker-compose.test.yml build
+              docker-compose --file docker-compose.test.yml run sut
           else
-            docker build . --file Dockerfile
+              docker build . --file Dockerfile
           fi
 
   # Push image to GitHub Packages.
@@ -152,41 +156,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set variables
+      - name: Setup environment variables
         run: |
-          IMAGE_ID_PHP=${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME_PHP
-
           # Change all uppercase to lowercase
-          IMAGE_ID_PHP=$(echo $IMAGE_ID_PHP | tr '[A-Z]' '[a-z]')
-
-          IMAGE_ID_NGINX=${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME_NGINX
-
-          # Change all uppercase to lowercase
-          IMAGE_ID_NGINX=$(echo $IMAGE_ID_NGINX | tr '[A-Z]' '[a-z]')
+          echo "::set-env name=IMAGE_ID_PHP::$(echo "${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME_PHP" | tr '[A-Z]' '[a-z]')"
+          echo "::set-env name=IMAGE_ID_NGINX::$(echo "${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME_NGINX" | tr '[A-Z]' '[a-z]')"
 
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [ "$VERSION" = 'master' ] && VERSION=latest
+          [ "$VERSION" = 'develop' ] && VERSION=nightly
 
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          # Figure out correct version
-          if [ "$VERSION" == "master" ]; then
-              DOCKER_VERSION=latest
-          elif [ "$VERSION" == "develop" ]; then
-              DOCKER_VERSION=nightly
-          else
-              DOCKER_VERSION=$VERSION
-          fi
-
-          echo "IMAGE_ID_PHP=$IMAGE_ID_PHP"
-          echo "::set-env name=IMAGE_ID_PHP::$IMAGE_ID_PHP"
-          echo "IMAGE_ID_NGINX=$IMAGE_ID_NGINX"
-          echo "::set-env name=IMAGE_ID_NGINX::$IMAGE_ID_NGINX"
-          echo "VERSION=$VERSION"
           echo "::set-env name=VERSION::$VERSION"
-          echo "DOCKER_VERSION=$DOCKER_VERSION"
-          echo "::set-env name=DOCKER_VERSION::$DOCKER_VERSION"
 
       - name: Build PHP image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME_PHP --target php
@@ -199,10 +183,10 @@ jobs:
 
       - name: Push PHP image to Docker Hub
         run: |
-          docker tag $IMAGE_NAME_PHP $IMAGE_ID_PHP:$DOCKER_VERSION
-          docker push $IMAGE_ID_PHP:$DOCKER_VERSION
+          docker tag $IMAGE_NAME_PHP $IMAGE_ID_PHP:$VERSION
+          docker push $IMAGE_ID_PHP:$VERSION
 
       - name: Push Nginx image to Docker Hub
         run: |
-          docker tag $IMAGE_NAME_NGINX $IMAGE_ID_NGINX:$DOCKER_VERSION
-          docker push $IMAGE_ID_NGINX:$DOCKER_VERSION
+          docker tag $IMAGE_NAME_NGINX $IMAGE_ID_NGINX:$VERSION
+          docker push $IMAGE_ID_NGINX:$VERSION

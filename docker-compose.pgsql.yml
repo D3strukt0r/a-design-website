@@ -3,6 +3,11 @@ version: "3.4"
 services:
   db:
     image: postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "--username=postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - internal
     volumes:
@@ -44,7 +49,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./web/cpresources:/app/web/cpresources:ro
+      - ./web:/app/web:ro
 
 networks:
   internal:

@@ -6,6 +6,11 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--password=password"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - internal
     volumes:
@@ -47,7 +52,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./web/cpresources:/app/web/cpresources:ro
+      - ./web:/app/web:ro
 
 networks:
   internal:

@@ -26,7 +26,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
         composer install --prefer-dist --no-interaction --no-plugins --no-scripts --no-progress --no-suggest
     fi
 
-    # Guess the port, if not set
+    # Guess the db port, if not set
     if [ -z "$DB_PORT" ]; then
         if [ "$DB_DRIVER" = "mysql" ]; then
             DB_PORT=3306
@@ -60,6 +60,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
         echo 'The db is now ready and reachable'
     fi
 
+    # Optimized php config
     {
         echo 'opcache.revalidate_freq = 0'
         if [ "$ENVIRONMENT" = 'prod' ]; then
@@ -84,6 +85,11 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
         echo "post_max_size = $PHP_POST_MAX_SIZE"
         echo "upload_max_filesize = $PHP_UPLOAD_MAX_FILESIZE"
     } >"$PHP_INI_DIR/conf.d/upload-limit.ini"
+
+    # Fix permission
+    chown www-data:www-data -R .; \
+    find . -type d -exec chmod 755 {} \;; \
+    find . -type f -exec chmod 644 {} \;
 
     # echo 'Linking config/license.key from /data to /app ...'
     # if [ ! -d /data/config ]; then

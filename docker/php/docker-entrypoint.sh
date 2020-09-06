@@ -15,8 +15,6 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
     fi
     ln -sf "$PHP_INI_RECOMMENDED" "$PHP_INI_DIR/php.ini"
 
-    # mkdir -p var/cache var/log
-
     if [ "$ENVIRONMENT" != 'prod' ] && [ -f /certs/localCA.crt ]; then
         ln -sf /certs/localCA.crt /usr/local/share/ca-certificates/localCA.crt
         update-ca-certificates
@@ -90,32 +88,6 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
     chown www-data:www-data -R .; \
     find . -type d -exec chmod 755 {} \;; \
     find . -type f -exec chmod 644 {} \;
-
-    # echo 'Linking config/license.key from /data to /app ...'
-    # if [ ! -d /data/config ]; then
-    #     mkdir -p /data/config
-    # fi
-    # if [ ! -f /data/config/license.key ]; then
-    #     touch /data/config/license.key
-    # fi
-    # ln -sf /data/config/license.key ./config/license.key
-
-    # echo 'Linking storage/ from /data to /app ...'
-    # if [ ! -d /data/storage ]; then
-    #     # cp /skeleton/storage /data
-    #     mkdir -p /data/storage
-    # fi
-    # ln -sf /data/storage ./storage
-
-    # echo 'Linking web/cpresources/ from /data to /app ...'
-    # if [ ! -d /data/web ]; then
-    #     mkdir -p /data/web
-    # fi
-    # if [ ! -d /data/web/cpresources ]; then
-    #     # cp /skeleton/web/cpresources /data/web
-    #     mkdir -p /data/web/cpresources
-    # fi
-    # ln -sf /data/web/cpresources ./web/cpresources
 fi
 
 exec docker-php-entrypoint "$@"

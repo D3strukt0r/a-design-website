@@ -30,4 +30,5 @@ storage/logs
 storage/runtime
 vendor/
 web/cpresources
+web/.htaccess
 web/web.config

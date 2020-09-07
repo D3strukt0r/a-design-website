@@ -9,22 +9,56 @@ fi
 
 # Setup php
 if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
+    echo 'Load/Create optimized PHP configs ...'
+
     PHP_INI_RECOMMENDED="$PHP_INI_DIR/php.ini-production"
     if [ "$ENVIRONMENT" != 'prod' ]; then
         PHP_INI_RECOMMENDED="$PHP_INI_DIR/php.ini-development"
     fi
     ln -sf "$PHP_INI_RECOMMENDED" "$PHP_INI_DIR/php.ini"
 
+    {
+        echo 'opcache.revalidate_freq = 0'
+        if [ "$ENVIRONMENT" = 'prod' ]; then
+            echo 'opcache.validate_timestamps = 0'
+        fi
+        echo "opcache.max_accelerated_files = $(find /app -type f -print | grep -c php)"
+        echo 'opcache.memory_consumption = 192'
+        echo 'opcache.interned_strings_buffer = 16'
+        echo 'opcache.fast_shutdown = 1'
+    } >"$PHP_INI_DIR/conf.d/opcache.ini"
+    {
+        echo 'apc.enable_cli = 1'
+        echo 'date.timezone = UTC'
+        echo 'session.auto_start = Off'
+        echo 'short_open_tag = Off'
+        echo "max_execution_time = $PHP_MAX_EXECUTION_TIME"
+        echo "memory_limit = $PHP_MEMORY_LIMIT"
+    } >"$PHP_INI_DIR/conf.d/misc.ini"
+    {
+        echo "post_max_size = $PHP_POST_MAX_SIZE"
+        echo "upload_max_filesize = $PHP_UPLOAD_MAX_FILESIZE"
+    } >"$PHP_INI_DIR/conf.d/upload-limit.ini"
+
+    # ----------------------------------------
+
     if [ "$ENVIRONMENT" != 'prod' ] && [ -f /certs/localCA.crt ]; then
+        echo 'Update CA certificates ...'
         ln -sf /certs/localCA.crt /usr/local/share/ca-certificates/localCA.crt
         update-ca-certificates
     fi
 
+    # ----------------------------------------
+
     if [ "$ENVIRONMENT" != 'prod' ]; then
+        echo 'Installing libraries according to non-production environment ...'
         composer install --prefer-dist --no-interaction --no-plugins --no-scripts --no-progress --no-suggest
     fi
 
-    # Guess the db port, if not set
+    # ----------------------------------------
+
+    echo 'Waiting for db to be ready...'
+
     if [ -z "$DB_PORT" ]; then
         if [ "$DB_DRIVER" = "mysql" ]; then
             DB_PORT=3306
@@ -33,7 +67,6 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
         fi
     fi
 
-    echo 'Waiting for db to be ready...'
     ATTEMPTS_LEFT_TO_REACH_DATABASE=60
     if [ "$DB_DRIVER" = "mysql" ]; then
         until [ $ATTEMPTS_LEFT_TO_REACH_DATABASE -eq 0 ] || mysql --host="$DB_SERVER" --port="$DB_PORT" --user="$DB_USER" --password="$DB_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; do
@@ -58,35 +91,11 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
         echo 'The db is now ready and reachable'
     fi
 
-    # Optimized php config
-    {
-        echo 'opcache.revalidate_freq = 0'
-        if [ "$ENVIRONMENT" = 'prod' ]; then
-            echo 'opcache.validate_timestamps = 0'
-        fi
-        echo "opcache.max_accelerated_files = $(find /app -type f -print | grep -c php)"
-        echo 'opcache.memory_consumption = 192'
-        echo 'opcache.interned_strings_buffer = 16'
-        echo 'opcache.fast_shutdown = 1'
-    } >"$PHP_INI_DIR/conf.d/opcache.ini"
+    # ----------------------------------------
 
-    {
-        echo 'apc.enable_cli = 1'
-        echo 'date.timezone = UTC'
-        echo 'session.auto_start = Off'
-        echo 'short_open_tag = Off'
-        echo "max_execution_time = $PHP_MAX_EXECUTION_TIME"
-        echo "memory_limit = $PHP_MEMORY_LIMIT"
-    } >"$PHP_INI_DIR/conf.d/misc.ini"
-
-    {
-        echo "post_max_size = $PHP_POST_MAX_SIZE"
-        echo "upload_max_filesize = $PHP_UPLOAD_MAX_FILESIZE"
-    } >"$PHP_INI_DIR/conf.d/upload-limit.ini"
-
-    # Fix permission
-    chown www-data:www-data -R .; \
-    find . -type d -exec chmod 755 {} \;; \
+    echo 'Fix directory/file permissions ...'
+    chown www-data:www-data -R .
+    find . -type d -exec chmod 755 {} \;
     find . -type f -exec chmod 644 {} \;
 fi
 

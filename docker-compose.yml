@@ -51,8 +51,11 @@ services:
       - internal
     ports:
       - 80:80
+      # - 443:443
     volumes:
       - ./web:/app/web:ro
+    # environment:
+    #   USE_HTTPS: "true"
 
 networks:
   internal:

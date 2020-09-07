@@ -70,19 +70,19 @@ RUN set -eux; \
     # Get all php requirements
     apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
-        # For gd
+        # Required for gd
         freetype-dev \
         libjpeg-turbo-dev \
         libpng-dev \
-        # For intl
+        # Required for intl
         icu-dev \
-        # For pdo_pgsql
+        # Required for pdo_pgsql
         postgresql-dev \
-        # For soap
+        # Required for soap
         libxml2-dev \
-        # For zip
+        # Required for zip
         libzip-dev \
-        # For imagick
+        # Required for imagick
         imagemagick-dev; \
     docker-php-ext-configure gd --with-freetype --with-jpeg >/dev/null; \
     docker-php-ext-install -j "$(nproc)" \
@@ -117,7 +117,7 @@ RUN set -eux; \
     # Set default php configuration
     ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini; \
     \
-    # prevent the reinstallation of vendors at every changes in the source code
+    # Prevent the reinstallation of vendors at every changes in the source code
     composer install --prefer-dist --no-dev --no-interaction --no-plugins --no-scripts --no-progress --no-suggest --optimize-autoloader; \
     composer clear-cache; \
     \
@@ -141,7 +141,7 @@ CMD ["php-fpm"]
 # -----------
 # Nginx stage
 # -----------
-# depends on the "php" stage above
+# Depends on the "php" stage above
 FROM nginx:${NGINX_VERSION}-alpine AS nginx
 
 ENV NGINX_CLIENT_MAX_BODY_SIZE=100M \
@@ -160,7 +160,12 @@ RUN set -eux; \
     apk add --no-cache \
         bash \
         openssl; \
-    rm /etc/nginx/conf.d/default.conf
+    \
+    # Remove default config, will be replaced on startup with custom one
+    rm /etc/nginx/conf.d/default.conf; \
+    \
+    # Empty all php files (to reduce container size). Only the file's existence is important
+    find . -type f -name "*.php" -exec sh -c 'i="$1"; >"$i"' _ {} \;
 
 VOLUME ["/data"]
 

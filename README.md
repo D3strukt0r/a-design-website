@@ -5,10 +5,10 @@ One Paragraph of project description goes here
 **Project**
 
 [![License](https://img.shields.io/github/license/d3strukt0r/a-design-cms)][license]
-[![Docker Stars](https://img.shields.io/docker/stars/d3strukt0r/a-design-cms-nginx.svg?label=docker%20stars%20(nginx))][docker]
-[![Docker Pulls](https://img.shields.io/docker/pulls/d3strukt0r/a-design-cms-nginx.svg?label=docker%20pulls%20(nginx))][docker]
-[![Docker Stars](https://img.shields.io/docker/stars/d3strukt0r/a-design-cms-php.svg?label=docker%20stars%20(php))][docker]
-[![Docker Pulls](https://img.shields.io/docker/pulls/d3strukt0r/a-design-cms-php.svg?label=docker%20pulls%20(php))][docker]
+[![Docker Stars](https://img.shields.io/docker/stars/d3strukt0r/a-design-cms-nginx.svg?label=docker%20stars%20(nginx))][docker-nginx]
+[![Docker Pulls](https://img.shields.io/docker/pulls/d3strukt0r/a-design-cms-nginx.svg?label=docker%20pulls%20(nginx))][docker-nginx]
+[![Docker Stars](https://img.shields.io/docker/stars/d3strukt0r/a-design-cms-php.svg?label=docker%20stars%20(php))][docker-php]
+[![Docker Pulls](https://img.shields.io/docker/pulls/d3strukt0r/a-design-cms-php.svg?label=docker%20pulls%20(php))][docker-php]
 
 **master**-branch (alias stable, latest)
 
@@ -19,8 +19,8 @@ One Paragraph of project description goes here
 [![GH Action CI/CD](https://github.com/D3strukt0r/a-design-cms/workflows/CI/CD/badge.svg?branch=develop)][gh-action]
 
 [license]: https://github.com/D3strukt0r/docker-spigot/blob/master/LICENSE.txt
-[docker]: https://hub.docker.com/repository/docker/d3strukt0r/a-design-cms-nginx
-[docker]: https://hub.docker.com/repository/docker/d3strukt0r/a-design-cms-php
+[docker-nginx]: https://hub.docker.com/repository/docker/d3strukt0r/a-design-cms-nginx
+[docker-php]: https://hub.docker.com/repository/docker/d3strukt0r/a-design-cms-php
 [gh-action]: https://github.com/D3strukt0r/docker-spigot/actions
 
 ## Getting Started

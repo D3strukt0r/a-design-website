@@ -11,9 +11,6 @@ ARG NGINX_VERSION=1.19
 # ---------
 FROM php:${PHP_VERSION}-fpm-alpine AS php
 
-# Build for production
-ARG APCU_VERSION=5.1.18
-
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1 \
     PATH="${PATH}:/root/.composer/vendor/bin" \
@@ -51,8 +48,8 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
 WORKDIR /app
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-COPY . .
 
+# Setup environment
 RUN set -eux; \
     rm -r docker; \
     \
@@ -95,7 +92,7 @@ RUN set -eux; \
         zip \
         >/dev/null; \
     pecl install imagick >/dev/null; \
-    pecl install apcu-${APCU_VERSION} >/dev/null; \
+    pecl install apcu >/dev/null; \
     pecl clear-cache; \
     docker-php-ext-enable \
         imagick \
@@ -112,7 +109,12 @@ RUN set -eux; \
     apk add --no-cache --virtual .phpexts-rundeps $RUN_DEPS; \
     \
     # Remove building tools for smaller container size
-    apk del .build-deps; \
+    apk del .build-deps
+
+COPY . .
+
+# Setup application
+RUN set -eux; \
     \
     # Set default php configuration
     ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini; \

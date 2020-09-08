@@ -69,13 +69,13 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
 
     ATTEMPTS_LEFT_TO_REACH_DATABASE=60
     if [ "$DB_DRIVER" = "mysql" ]; then
-        until [ $ATTEMPTS_LEFT_TO_REACH_DATABASE -eq 0 ] || mysql --host="$DB_SERVER" --port="$DB_PORT" --user="$DB_USER" --password="$DB_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; do
+        until [ $ATTEMPTS_LEFT_TO_REACH_DATABASE = 0 ] || mysql --host="$DB_SERVER" --port="$DB_PORT" --user="$DB_USER" --password="$DB_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; do
             sleep 1
             ATTEMPTS_LEFT_TO_REACH_DATABASE=$((ATTEMPTS_LEFT_TO_REACH_DATABASE - 1))
             echo "Still waiting for db to be ready... Or maybe the db is not reachable. $ATTEMPTS_LEFT_TO_REACH_DATABASE attempts left"
         done
     elif [ "$DB_DRIVER" = "pgsql" ]; then
-        until [ $ATTEMPTS_LEFT_TO_REACH_DATABASE -eq 0 ] || pg_isready --host="$DB_SERVER" --port="$DB_PORT" --username="$DB_USER" --dbname="$DB_DATABASE" >/dev/null 2>&1; do
+        until [ $ATTEMPTS_LEFT_TO_REACH_DATABASE = 0 ] || pg_isready --host="$DB_SERVER" --port="$DB_PORT" --username="$DB_USER" --dbname="$DB_DATABASE" >/dev/null 2>&1; do
             sleep 1
             ATTEMPTS_LEFT_TO_REACH_DATABASE=$((ATTEMPTS_LEFT_TO_REACH_DATABASE - 1))
             echo "Still waiting for db to be ready... Or maybe the db is not reachable. $ATTEMPTS_LEFT_TO_REACH_DATABASE attempts left"
@@ -84,7 +84,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
         echo "Database not supported! Use either MySQL or PostgreSQL"
     fi
 
-    if [ $ATTEMPTS_LEFT_TO_REACH_DATABASE -eq 0 ]; then
+    if [ $ATTEMPTS_LEFT_TO_REACH_DATABASE = 0 ]; then
         echo 'The db is not up or not reachable'
         exit 1
     else

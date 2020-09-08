@@ -1,4 +1,4 @@
-# the different stages of this Dockerfile are meant to be built into separate images
+# The different stages of this Dockerfile are meant to be built into separate images
 # https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage
 # https://docs.docker.com/compose/compose-file/#target
 
@@ -11,7 +11,7 @@ ARG NGINX_VERSION=1.19
 # ---------
 FROM php:${PHP_VERSION}-fpm-alpine AS php
 
-# build for production
+# Build for production
 ARG APCU_VERSION=5.1.18
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
@@ -156,6 +156,7 @@ COPY docker/nginx/default.conf     /etc/nginx/conf.d/default.template
 COPY docker/nginx/default-ssl.conf /etc/nginx/conf.d/default-ssl.template
 
 RUN set -eux; \
+    \
     apk update; \
     apk add --no-cache \
         bash \

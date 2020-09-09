@@ -98,7 +98,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
     # The port to connect to the database with
     : "${DB_PORT:=}"
     # The name of the database to select
-    : "${DB_DATABASE:=}"
+    : "${DB_DATABASE:=craft}"
     # The database username to connect with
     : "${DB_USER:=root}"
     # The database password to connect with

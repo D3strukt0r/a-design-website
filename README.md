@@ -1,6 +1,6 @@
-# a-design.ch Website (CMS)
+# a-design.ch CMS (a-design-cms-php & a-design-cms-nginx)
 
-One Paragraph of project description goes here
+This project is specifically for the company [a-design](https://www.a-design.ch). It's built using CraftCMS inside Docker for easy development, testing and deployment.
 
 Project
 
@@ -28,59 +28,88 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+In order to run this container you'll need docker installed.
 
-```
-Give examples
-```
+-   [Windows](https://docs.docker.com/docker-for-windows/install/)
+-   [OS X](https://docs.docker.com/docker-for-mac/install/)
+-   [Linux](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 
-### Installing
+### Usage
 
-A step by step series of examples that tell you how to get a development env running
+#### Container Parameters
 
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
+```shell
+docker run \
+    -v $PWD/cpresources:/app/web/cpresources \
+    -v $PWD/cms-logs:/app/storage/logs \
+    -v $PWD/craftcms-license.key:/app/config/license.key \
+    -e APP_ID="CraftCMS--!changeme!" \
+    -e SECURITY_KEY="!changeme!" \
+    -e DEFAULT_SITE_URL="https://localhost" \
+    d3strukt0r/a-design-cms-php
 ```
 
-### And coding style tests
-
-Explain what these tests test and why
-
+```shell
+docker run \
+    -p 80:80 \
+    -v $PWD/cpresources:/app/web/cpresources:ro \
+    d3strukt0r/a-design-cms-nginx
 ```
-Give an example
-```
 
-## Deployment
+#### Environment Variables
 
-Add additional notes about how to deploy this on a live system
+##### PHP Envs
+
+###### PHP settings
+
+-   `PHP_MAX_EXECUTION_TIME` - The maximum time php can run per request (Default: `100M`)
+-   `PHP_MEMORY_LIMIT` - The memory limit that php can use (Default: `256M`)
+-   `PHP_POST_MAX_SIZE` - The maximum size for sending POST requests (maximum upload size) (has to be the same on nginx) (Default: `100M`)
+-   `PHP_UPLOAD_MAX_FILESIZE` - The maximum size per file for uploading (Default: `100M`)
+
+###### Database settings
+
+-   `DB_DRIVER` - The database driver that will be used (mysql or pgsql) (Default: `mysql`)
+-   `DB_SERVER` - The database server name or IP address (Default: `db`)
+-   `DB_PORT` - The port to connect to the database with (Default: `3306` (mysql) or `5432` (pgsql))
+-   `DB_DATABASE` - The name of the database to select (Default: `craft`)
+-   `DB_USER` - The database username to connect with (Default: `root`)
+-   `DB_PASSWORD` - The database password to connect with (Default: )
+-   `DB_SCHEMA` - The database schema that will be used (PostgreSQL only) (Default: `public`)
+-   `DB_TABLE_PREFIX` - The prefix that should be added to generated table names (only necessary if multiple things are sharing the same database) (Default: )
+
+###### CraftCMS settings
+
+-   `ENVIRONMENT` - The environment Craft is currently running in (dev, staging, production, etc.) (Default: `prod`)
+-   `APP_ID` - The application ID used to to uniquely store session and cache data, mutex locks, and more (Default: `CraftCMS`) (Required)
+-   `SECURITY_KEY` - The secure key Craft will use for hashing and encrypting data (Default: ) (Required)
+-   `DEFAULT_SITE_URL` - The URL the site will use mainly (Default: ) (Required)
+
+##### Nginx Envs
+
+-   `NGINX_CLIENT_MAX_BODY_SIZE` - The maximum size for sending POST requests (maximum upload size) (has to be the same on php) (Default: `100M`)
+-   `USE_HTTPS` - Enables https. (Not recommeded, rather use Traefik) (Default: `false`)
+
+#### Volumes
+
+-   `/app` - All the data
+-   `/app/config/license.key` - A license key (if needed)
+-   `/app/storage/logs` - The logs created by CraftCMS
+-   `/app/web/cpresources` - The frontend resources (should be syncronized between the php and nginx environment)
+
+#### Useful File Locations
+
+##### PHP Files
+
+-   `/app/craft` - The craft command line tool
 
 ## Built With
 
--   [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
--   [Maven](https://maven.apache.org/) - Dependency Management
--   [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+-   [PHP](https://www.php.net/) - Main Programming Language
+-   [Composer](https://getcomposer.org/) - Dependency Management
+-   [CraftCMS](https://craftcms.com) - The web framework used
+-   [Github Actions](https://github.com/features/actions) - Automatic CI (Testing) / CD (Deployment)
+-   [Docker](https://www.docker.com) - Building a Container for the Server
 
 ## Contributing
 

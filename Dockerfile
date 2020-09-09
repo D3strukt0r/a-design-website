@@ -34,7 +34,14 @@ RUN set -eux; \
         mysql-client \
         postgresql-client \
         # Required for healthcheck
-        fcgi
+        fcgi; \
+    \
+    # Custom bash config
+    { \
+        echo 'source /etc/profile.d/bash_completion.sh'; \
+        # <green> user@host <normal> : <blue> dir <normal> $#
+        echo 'export PS1="🐳 \e[38;5;10m\u@\h\e[0m:\e[38;5;12m\w\e[0m\\$ "'; \
+    } >"$HOME/.bashrc"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -132,7 +139,14 @@ RUN set -eux; \
     apk add --no-cache \
         bash \
         bash-completion \
-        openssl
+        openssl; \
+    \
+    # Custom bash config
+    { \
+        echo 'source /etc/profile.d/bash_completion.sh'; \
+        # <green> user@host <normal> : <blue> dir <normal> $#
+        echo 'export PS1="🐳 \e[38;5;10m\u@\h\e[0m:\e[38;5;12m\w\e[0m\\$ "'; \
+    } >"$HOME/.bashrc"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 

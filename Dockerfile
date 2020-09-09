@@ -13,48 +13,20 @@ FROM php:${PHP_VERSION}-fpm-alpine AS php
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1 \
-    PATH="${PATH}:/root/.composer/vendor/bin" \
-    PHP_MAX_EXECUTION_TIME=120 \
-    # 'memory_limit' has to be larger than 'post_max_size' and 'upload_max_filesize'
-    PHP_MEMORY_LIMIT=256M \
-    # Important for upload limit. 'post_max_size' has to be larger than 'upload_max_filesize'
-    PHP_POST_MAX_SIZE=100M \
-    PHP_UPLOAD_MAX_FILESIZE=100M \
-    # The environment Craft is currently running in (dev, staging, production, etc.)
-    ENVIRONMENT=prod \
-    # The application ID used to to uniquely store session and cache data, mutex locks, and more
-    APP_ID=CraftCMS \
-    # The secure key Craft will use for hashing and encrypting data
-    SECURITY_KEY= \
-    # The database driver that will be used (mysql or pgsql)
-    DB_DRIVER=mysql \
-    # The database server name or IP address
-    DB_SERVER=db \
-    # The port to connect to the database with
-    DB_PORT= \
-    # The name of the database to select
-    DB_DATABASE= \
-    # The database username to connect with
-    DB_USER=root \
-    # The database password to connect with
-    DB_PASSWORD= \
-    # The database schema that will be used (PostgreSQL only)
-    DB_SCHEMA=public \
-    # The prefix that should be added to generated table names (only necessary if multiple
-    # things are sharing the same database)
-    DB_TABLE_PREFIX= \
-    DEFAULT_SITE_URL=
+    PATH="${PATH}:/root/.composer/vendor/bin"
 
 WORKDIR /app
 
+# hadolint ignore=DL3022
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Setup environment
+# hadolint ignore=DL3018
 RUN set -eux; \
-    rm -r docker; \
     \
     apk update; \
     apk add --no-cache \
+        bash \
+        bash-completion \
         # Alpine package for "imagemagick" contains ~120 .so files,
         # see: https://github.com/docker-library/wordpress/pull/497
         imagemagick \
@@ -62,7 +34,12 @@ RUN set -eux; \
         mysql-client \
         postgresql-client \
         # Required for healthcheck
-        fcgi; \
+        fcgi
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# hadolint ignore=DL3018,SC2086
+RUN set -eux; \
     \
     # Get all php requirements
     apk add --no-cache --virtual .build-deps \
@@ -113,11 +90,11 @@ RUN set -eux; \
 
 COPY . .
 
-# Setup application
 RUN set -eux; \
+    rm -r docker; \
     \
     # Set default php configuration
-    ln -s $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini; \
+    ln -s "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
     \
     # Prevent the reinstallation of vendors at every changes in the source code
     composer install --prefer-dist --no-dev --no-interaction --no-plugins --no-scripts --no-progress --no-suggest --optimize-autoloader; \
@@ -146,10 +123,18 @@ CMD ["php-fpm"]
 # Depends on the "php" stage above
 FROM nginx:${NGINX_VERSION}-alpine AS nginx
 
-ENV NGINX_CLIENT_MAX_BODY_SIZE=100M \
-    USE_HTTPS=false
-
 WORKDIR /app/web
+
+# hadolint ignore=DL3018
+RUN set -eux; \
+    \
+    apk update; \
+    apk add --no-cache \
+        bash \
+        bash-completion \
+        openssl
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 COPY --from=php /app/web/ ./
 
@@ -159,16 +144,14 @@ COPY docker/nginx/default-ssl.conf /etc/nginx/conf.d/default-ssl.template
 
 RUN set -eux; \
     \
-    apk update; \
-    apk add --no-cache \
-        bash \
-        openssl; \
-    \
     # Remove default config, will be replaced on startup with custom one
     rm /etc/nginx/conf.d/default.conf; \
     \
     # Empty all php files (to reduce container size). Only the file's existence is important
-    find . -type f -name "*.php" -exec sh -c 'i="$1"; >"$i"' _ {} \;
+    find . -type f -name "*.php" -exec sh -c 'i="$1"; >"$i"' _ {} \;; \
+    \
+    # Fix permission
+    adduser -u 82 -D -S -G www-data www-data
 
 VOLUME ["/data"]
 

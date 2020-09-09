@@ -9,8 +9,22 @@ on:
     branches:
       - master
       - develop
+    paths:
+      - .github/workflows/ci-cd.yml
+      - 'config/**'
+      - 'docker/**'
+      - 'modules/**'
+      - 'storage/rebrand/**'
+      - 'templates/**'
+      - 'tests/**'
+      - 'web/**'
+      - .dockerignore
+      - codeception.yml
+      - composer.json
+      - composer.lock
+      - craft
+      - '**/Dockerfile'
 
-  # Run tests for any PRs.
   pull_request:
 
   workflow_dispatch:

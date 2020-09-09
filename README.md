@@ -2,7 +2,7 @@
 
 One Paragraph of project description goes here
 
-**Project**
+Project
 
 [![License](https://img.shields.io/github/license/d3strukt0r/a-design-cms)][license]
 [![Docker Stars](https://img.shields.io/docker/stars/d3strukt0r/a-design-cms-nginx.svg?label=docker%20stars%20(nginx))][docker-nginx]
@@ -10,18 +10,17 @@ One Paragraph of project description goes here
 [![Docker Stars](https://img.shields.io/docker/stars/d3strukt0r/a-design-cms-php.svg?label=docker%20stars%20(php))][docker-php]
 [![Docker Pulls](https://img.shields.io/docker/pulls/d3strukt0r/a-design-cms-php.svg?label=docker%20pulls%20(php))][docker-php]
 
-**master**-branch (alias stable, latest)
+master-branch (alias stable, latest)
 
 [![GH Action CI/CD](https://github.com/D3strukt0r/a-design-cms/workflows/CI/CD/badge.svg?branch=master)][gh-action]
+[![Codacy grade](https://img.shields.io/codacy/grade/96966fb63138492e9657bafc6adefa2b/master)][codacy]
 
-**develop**-branch (alias nightly)
+<!--
+develop-branch (alias nightly)
 
 [![GH Action CI/CD](https://github.com/D3strukt0r/a-design-cms/workflows/CI/CD/badge.svg?branch=develop)][gh-action]
-
-[license]: https://github.com/D3strukt0r/docker-spigot/blob/master/LICENSE.txt
-[docker-nginx]: https://hub.docker.com/repository/docker/d3strukt0r/a-design-cms-nginx
-[docker-php]: https://hub.docker.com/repository/docker/d3strukt0r/a-design-cms-php
-[gh-action]: https://github.com/D3strukt0r/docker-spigot/actions
+[![Codacy grade](https://img.shields.io/codacy/grade/96966fb63138492e9657bafc6adefa2b/develop)][codacy]
+-->
 
 ## Getting Started
 
@@ -106,3 +105,9 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 -   Hat tip to anyone whose code was used
 -   Inspiration
 -   etc
+
+[license]: https://github.com/D3strukt0r/docker-spigot/blob/master/LICENSE.txt
+[docker-nginx]: https://hub.docker.com/repository/docker/d3strukt0r/a-design-cms-nginx
+[docker-php]: https://hub.docker.com/repository/docker/d3strukt0r/a-design-cms-php
+[gh-action]: https://github.com/D3strukt0r/docker-spigot/actions
+[codacy]: https://www.codacy.com/manual/D3strukt0r/a-design-cms

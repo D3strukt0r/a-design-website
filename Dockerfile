@@ -17,9 +17,6 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
 
 WORKDIR /app
 
-# hadolint ignore=DL3022
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
 # hadolint ignore=DL3018
 RUN set -eux; \
     \
@@ -94,6 +91,23 @@ RUN set -eux; \
     \
     # Remove building tools for smaller container size
     apk del .build-deps
+
+RUN set -eux; \
+    \
+    # Install composer
+    curl -fsSL -o composer-setup.php https://getcomposer.org/installer; \
+    EXPECTED_CHECKSUM="$(curl -fsSL https://composer.github.io/installer.sig)"; \
+    ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', 'composer-setup.php');")"; \
+    \
+    if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then \
+        >&2 echo 'ERROR: Invalid installer checksum'; \
+        rm composer-setup.php; \
+        exit 1; \
+    fi; \
+    \
+    php composer-setup.php --quiet; \
+    rm composer-setup.php; \
+    mv composer.phar /usr/bin/composer
 
 COPY . .
 

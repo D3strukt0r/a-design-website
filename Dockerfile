@@ -127,7 +127,7 @@ RUN set -eux; \
     find . -type f -exec chmod 644 {} \;
 
 # https://github.com/renatomefi/php-fpm-healthcheck
-RUN wget -O /usr/local/bin/php-fpm-healthcheck https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck; \
+RUN curl -fsSL -o /usr/local/bin/php-fpm-healthcheck https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck; \
     chmod +x /usr/local/bin/php-fpm-healthcheck; \
     echo 'pm.status_path = /status' >> /usr/local/etc/php-fpm.d/zz-docker.conf
 HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["php-fpm-healthcheck"]

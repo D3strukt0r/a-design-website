@@ -82,22 +82,22 @@ if [ "$1" = 'nginx' ]; then
             fi
             cd /certs
 
-            echo 'Creating SSL certificate ...'
+            entrypoint_note 'Creating SSL certificate ...'
             openssl req -new -newkey rsa:4096 -x509 -sha256 -days 365 -nodes -out website.crt -keyout website.key -subj "/C=/ST=/L=/O=/OU=/CN="
         fi
 
         # Link files
-        echo 'Linking certificate to /etc/ssl/certs/* ...'
+        entrypoint_note 'Linking certificate to /etc/ssl/certs/* ...'
         ln -sf /certs/website.crt /etc/ssl/certs/website.crt
         ln -sf /certs/website.key /etc/ssl/certs/website.key
 
-        echo 'Enabling HTTPS for nginx ...'
+        entrypoint_note 'Enabling HTTPS for nginx ...'
         if [ ! -f /etc/nginx/conf.d/default-ssl.conf ]; then
             # shellcheck disable=SC2016,SC2046
             envsubst "$(printf '${%s} ' $(compgen -A variable))" </etc/nginx/conf.d/default-ssl.template >/etc/nginx/conf.d/default-ssl.conf
         fi
     else
-        echo 'Enabling HTTP for nginx ...'
+        entrypoint_note 'Enabling HTTP for nginx ...'
         # shellcheck disable=SC2016,SC2046
         envsubst "$(printf '${%s} ' $(compgen -A variable))" </etc/nginx/conf.d/default.template >/etc/nginx/conf.d/default.conf
     fi

@@ -41,6 +41,8 @@ services:
       cache_from:
         - ${PHP_IMAGE_CACHE:-d3strukt0r/a-design-cms-php}
     image: ${PHP_IMAGE:-d3strukt0r/a-design-cms-php}
+    healthcheck:
+      start_period: 1m40s
     depends_on:
       - db
     networks:
@@ -67,8 +69,11 @@ services:
       context: .
       target: nginx
       cache_from:
+        - ${PHP_IMAGE_CACHE:-d3strukt0r/a-design-cms-php}
         - ${NGINX_IMAGE_CACHE:-d3strukt0r/a-design-cms-nginx}
     image: ${NGINX_IMAGE:-d3strukt0r/a-design-cms-nginx}
+    healthcheck:
+      test: test -e /var/run/nginx.pid || exit 1
     depends_on:
       - php
     networks:
@@ -87,4 +92,4 @@ networks:
 
 volumes:
   database-mysql:
-  database-pgsql:
+  # database-pgsql:

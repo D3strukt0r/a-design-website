@@ -1,4 +1,4 @@
-dateModified: 1599169469
+dateModified: 1600884944
 email:
   fromEmail: info@a-design.ch
   fromName: a-design
@@ -7,7 +7,7 @@ plugins:
   commerce:
     edition: lite
     enabled: true
-    schemaVersion: 3.2.3
+    schemaVersion: 3.2.6
 system:
   edition: pro
   live: true

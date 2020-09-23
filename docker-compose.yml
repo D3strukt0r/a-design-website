@@ -38,6 +38,9 @@ services:
     build:
       context: .
       target: php
+      cache_from:
+        - ${PHP_IMAGE_CACHE:-d3strukt0r/a-design-cms-php}
+    image: ${PHP_IMAGE:-d3strukt0r/a-design-cms-php}
     depends_on:
       - db
     networks:
@@ -59,10 +62,13 @@ services:
       DB_DATABASE: craft
       DEFAULT_SITE_URL: http://localhost
 
-  web:
+  nginx:
     build:
       context: .
       target: nginx
+      cache_from:
+        - ${NGINX_IMAGE_CACHE:-d3strukt0r/a-design-cms-nginx}
+    image: ${NGINX_IMAGE:-d3strukt0r/a-design-cms-nginx}
     depends_on:
       - php
     networks:

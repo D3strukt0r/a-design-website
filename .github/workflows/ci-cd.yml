@@ -11,19 +11,19 @@ on:
       - develop
     paths:
       - .github/workflows/ci-cd.yml
-      - 'config/**'
-      - 'docker/**'
-      - 'modules/**'
-      - 'storage/rebrand/**'
-      - 'templates/**'
-      - 'tests/**'
-      - 'web/**'
+      - "config/**"
+      - "docker/**"
+      - "modules/**"
+      - "storage/rebrand/**"
+      - "templates/**"
+      - "tests/**"
+      - "web/**"
       - .dockerignore
       - codeception.yml
       - composer.json
       - composer.lock
       - craft
-      - '**/Dockerfile'
+      - "**/Dockerfile"
 
   pull_request:
 
@@ -60,22 +60,21 @@ jobs:
           --health-timeout 5s
           --health-retries 3
 
-      postgres:
-        image: postgres
-        ports:
-          - 5432
-        env:
-          POSTGRES_DB: test
-          POSTGRES_PASSWORD: password
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+      # postgres:
+      #   image: postgres
+      #   ports:
+      #     - 5432
+      #   env:
+      #     POSTGRES_DB: test
+      #     POSTGRES_PASSWORD: password
+      #   options: >-
+      #     --health-cmd pg_isready
+      #     --health-interval 10s
+      #     --health-timeout 5s
+      #     --health-retries 5
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Setup environment variables
         run: |
@@ -123,8 +122,7 @@ jobs:
         id: composer-cache-dir-path
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
-      - name: Cache Composer libraries
-        uses: actions/cache@v2
+      - uses: actions/cache@v2
         id: composer-cache # use this to check for `cache-hit` (`steps.composer-cache.outputs.cache-hit != 'true'`)
         with:
           path: ${{ steps.composer-cache-dir-path.outputs.dir }}
@@ -140,11 +138,11 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-plugins --no-scripts --no-progress --no-suggest
 
       - name: Run tests
-        if: matrix.test_with_coverage != 1
+        if: github.event_name != 'push' || github.repository != 'D3strukt0r/a-design-cms' || matrix.test_with_coverage != 1
         run: vendor/bin/codecept run unit
 
       - name: Run tests with coverage
-        if: matrix.test_with_coverage == 1
+        if: github.event_name == 'push' && github.repository == 'D3strukt0r/a-design-cms' && matrix.test_with_coverage == 1
         run: |
           mkdir -p build/logs
           vendor/bin/codecept run unit --coverage-xml coverage.xml
@@ -166,11 +164,10 @@ jobs:
     needs: test
 
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'push' && github.repository == 'D3strukt0r/a-design-cms'
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Setup environment variables
         run: |
@@ -188,21 +185,16 @@ jobs:
 
           echo "::set-env name=VERSION::$VERSION"
 
-      - name: Build PHP image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME_PHP --target php
-
-      - name: Build Nginx image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME_NGINX --target nginx
-
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
-      - name: Push PHP image to Docker Hub
-        run: |
-          docker tag $IMAGE_NAME_PHP $IMAGE_ID_PHP:$VERSION
-          docker push $IMAGE_ID_PHP:$VERSION
+      - name: Build images
+        run: docker-compose build
 
-      - name: Push Nginx image to Docker Hub
-        run: |
-          docker tag $IMAGE_NAME_NGINX $IMAGE_ID_NGINX:$VERSION
-          docker push $IMAGE_ID_NGINX:$VERSION
+      - name: Push images
+        env:
+          PHP_IMAGE_CACHE: ${{ env.IMAGE_ID_PHP }}
+          PHP_IMAGE: ${{ env.IMAGE_ID_PHP }}:${{ env.VERSION }}
+          NGINX_IMAGE_CACHE: ${{ env.IMAGE_ID_NGINX }}
+          NGINX_IMAGE: ${{ env.IMAGE_ID_NGINX }}:${{ env.VERSION }}
+        run: docker-compose push php nginx

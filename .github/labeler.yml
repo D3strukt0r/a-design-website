@@ -1,0 +1,23 @@
+# Add 'repo' label to any root file changes
+repo:
+  - ./*
+
+# Add 'docker' label to any change to files within the docker dir and docker relevant files
+docker:
+  - docker/**/*
+  - .dockerignore
+  - docker-compose.yml
+  - Dockerfile
+
+# Add 'source' label to any change to files within the modules dir
+source:
+  - modules/**/*
+
+# Add 'template' label to any change to files within the templates dir
+template:
+  - templates/**/*
+
+# Add 'test' label to any change to files within the tests dir
+test:
+  - tests/**/*
+  - codeception.yml

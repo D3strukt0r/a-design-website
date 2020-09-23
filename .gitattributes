@@ -282,3 +282,15 @@ Procfile text
 *.*ignore text
 
 # End of https://www.richie-bendall.ml/gitattributes-generator/
+
+*.php eol=lf
+
+.github export-ignore
+.idea export-ignore
+docker export-ignore
+tests export-ignore
+.dockerignore export-ignore
+.editorconfig export-ignore
+codeception.yml export-ignore
+docker-compose.yml export-ignore
+Dockerfile export-ignore

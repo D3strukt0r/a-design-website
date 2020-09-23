@@ -1,11 +1,11 @@
-dateModified: 1600884944
+dateModified: 1600899973
 email:
   fromEmail: info@a-design.ch
   fromName: a-design
   transportType: craft\mail\transportadapters\Sendmail
 plugins:
   commerce:
-    edition: lite
+    edition: pro
     enabled: true
     schemaVersion: 3.2.6
 system:

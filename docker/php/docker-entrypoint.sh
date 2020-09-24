@@ -227,6 +227,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
     chown www-data:www-data -R .
     find . -type d -exec chmod 755 {} \;
     find . -type f -exec chmod 644 {} \;
+    chmod +x craft
 fi
 
 exec docker-php-entrypoint "$@"

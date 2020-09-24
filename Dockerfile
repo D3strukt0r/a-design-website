@@ -17,6 +17,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
 
 WORKDIR /app
 
+# Setup Alpine
 # hadolint ignore=DL3018
 RUN set -eux; \
     \
@@ -42,6 +43,7 @@ RUN set -eux; \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+# Build PHP
 # hadolint ignore=DL3018,SC2086
 RUN set -eux; \
     \
@@ -92,7 +94,11 @@ RUN set -eux; \
     # Remove building tools for smaller container size
     apk del .build-deps
 
+# Setup PHP
 RUN set -eux; \
+    \
+    # Set default php configuration
+    ln -s "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
     \
     # Install composer
     curl -fsSL -o composer-setup.php https://getcomposer.org/installer; \
@@ -109,22 +115,26 @@ RUN set -eux; \
     rm composer-setup.php; \
     mv composer.phar /usr/bin/composer
 
-COPY . .
-
+# Prevent the reinstallation of vendors at every changes in the source code
+COPY composer.json composer.lock ./
 RUN set -eux; \
-    rm -r docker; \
-    \
-    # Set default php configuration
-    ln -s "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
-    \
-    # Prevent the reinstallation of vendors at every changes in the source code
-    composer install --prefer-dist --no-dev --no-interaction --no-plugins --no-scripts --no-progress --no-suggest --optimize-autoloader; \
-    composer clear-cache; \
+	composer install --prefer-dist --no-dev --no-interaction --no-plugins --no-scripts --no-progress --no-suggest --optimize-autoloader; \
+    composer clear-cache
+
+# Setup application
+COPY craft ./
+COPY config ./config
+COPY modules ./modules
+COPY storage ./storage
+COPY templates ./templates
+COPY web ./web
+RUN set -eux; \
     \
     # Fix permission
     chown www-data:www-data -R .; \
     find . -type d -exec chmod 755 {} \;; \
-    find . -type f -exec chmod 644 {} \;
+    find . -type f -exec chmod 644 {} \;; \
+    chmod +x craft
 
 # https://github.com/renatomefi/php-fpm-healthcheck
 RUN curl -fsSL -o /usr/local/bin/php-fpm-healthcheck https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck; \
@@ -144,6 +154,7 @@ FROM nginx:${NGINX_VERSION}-alpine AS nginx
 
 WORKDIR /app/web
 
+# Setup Alpine
 # hadolint ignore=DL3018
 RUN set -eux; \
     \
@@ -162,6 +173,7 @@ RUN set -eux; \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+# Setup Nginx
 COPY --from=php /app/web/ ./
 
 COPY docker/nginx/nginx.conf       /etc/nginx/nginx.template

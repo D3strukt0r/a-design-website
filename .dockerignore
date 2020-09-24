@@ -20,6 +20,7 @@
 .env.local
 .env.local.php
 .php_cs.cache
+codeception.yml
 .github/
 .idea/
 storage/backups
@@ -28,6 +29,7 @@ storage/config-backups
 storage/config-deltas
 storage/logs
 storage/runtime
+tests/
 vendor/
 web/cpresources
 web/.htaccess

@@ -46,8 +46,14 @@ jobs:
           - php: 7.4
             db: mysql
             test_with_coverage: 1
+            test_build: 1
 
     services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+
       mysql:
         image: mariadb
         ports:
@@ -158,6 +164,7 @@ jobs:
 
       - name: Setup QEMU
         id: qemu
+        if: matrix.test_build == 1
         uses: docker/setup-qemu-action@v1
         # with:
         #   # QEMU static binaries Docker image
@@ -167,6 +174,7 @@ jobs:
 
       - name: Setup Docker Buildx
         id: buildx
+        if: matrix.test_build == 1
         uses: docker/setup-buildx-action@v1
         with:
           # Buildx version.
@@ -186,6 +194,7 @@ jobs:
 
       # https://github.com/marketplace/actions/build-and-push-docker-images#leverage-github-cache
       - name: Cache Docker layers
+        if: matrix.test_build == 1
         uses: actions/cache@v2
         with:
           # A list of files, directories, and wildcard patterns to cache and restore. See @actions/glob for supported patterns.
@@ -197,6 +206,7 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Build PHP (Docker)
+        if: matrix.test_build == 1
         uses: docker/build-push-action@v2
         with:
           # Builder instance (see setup-buildx action)
@@ -220,7 +230,7 @@ jobs:
           # Do not use cache when building the image
           # no-cache: false # optional, default is "false"
           # List of target platforms for build
-          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6 # optional
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7 # optional
           # Load is a shorthand for --output=type=docker
           # load: false # optional, default is "false"
           # Push is a shorthand for --output=type=registry
@@ -235,6 +245,7 @@ jobs:
           # secrets: # optional
 
       - name: Build Nginx (Docker)
+        if: matrix.test_build == 1
         uses: docker/build-push-action@v2
         with:
           # Builder instance (see setup-buildx action)
@@ -258,7 +269,7 @@ jobs:
           # Do not use cache when building the image
           # no-cache: false # optional, default is "false"
           # List of target platforms for build
-          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6 # optional
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7 # optional
           # Load is a shorthand for --output=type=docker
           # load: false # optional, default is "false"
           # Push is a shorthand for --output=type=registry
@@ -423,7 +434,7 @@ jobs:
           # Do not use cache when building the image
           # no-cache: false # optional, default is "false"
           # List of target platforms for build
-          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6 # optional
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7 # optional
           # Load is a shorthand for --output=type=docker
           # load: false # optional, default is "false"
           # Push is a shorthand for --output=type=registry
@@ -472,7 +483,7 @@ jobs:
           # Do not use cache when building the image
           # no-cache: false # optional, default is "false"
           # List of target platforms for build
-          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6 # optional
+          platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7 # optional
           # Load is a shorthand for --output=type=docker
           # load: false # optional, default is "false"
           # Push is a shorthand for --output=type=registry

@@ -118,7 +118,7 @@ RUN set -eux; \
 # Prevent the reinstallation of vendors at every changes in the source code
 COPY composer.json composer.lock ./
 RUN set -eux; \
-	composer install --prefer-dist --no-dev --no-interaction --no-plugins --no-scripts --no-progress --no-suggest --optimize-autoloader; \
+    composer install --prefer-dist --no-dev --no-interaction --no-plugins --no-scripts --no-progress --no-suggest --optimize-autoloader; \
     composer clear-cache
 
 # Setup application

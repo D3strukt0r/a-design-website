@@ -283,6 +283,12 @@ jobs:
           # List of secrets to expose to the build (eg. key=value, GIT_AUTH_TOKEN=mytoken)
           # secrets: # optional
 
+      - name: Inspect
+        if: matrix.test_build == 1
+        run: |
+          docker buildx imagetools inspect localhost:5000/name/app1:latest
+          docker buildx imagetools inspect localhost:5000/name/app2:latest
+
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   deploy:

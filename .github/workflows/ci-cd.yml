@@ -405,8 +405,8 @@ jobs:
           # Log out from the Docker registry at the end of a job
           # logout: true # optional, default is "true"
 
-      - name: Build and push API PHP
-        id: docker_build_api_php
+      - name: Build and push PHP
+        id: docker_build_php
         uses: docker/build-push-action@v2
         with:
           # Builder instance (see setup-buildx action)
@@ -454,8 +454,8 @@ jobs:
           # List of secrets to expose to the build (eg. key=value, GIT_AUTH_TOKEN=mytoken)
           # secrets: # optional
 
-      - name: Build and push API Nginx
-        id: docker_build_api_nginx
+      - name: Build and push Nginx
+        id: docker_build_nginx
         uses: docker/build-push-action@v2
         with:
           # Builder instance (see setup-buildx action)

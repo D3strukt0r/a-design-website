@@ -223,11 +223,11 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
 
     # ----------------------------------------
 
-    entrypoint_note 'Fix directory/file permissions'
-    chown www-data:www-data -R .
-    find . -type d -exec chmod 755 {} \;
-    find . -type f -exec chmod 644 {} \;
-    chmod +x craft
+    # entrypoint_note 'Fix directory/file permissions'
+    # chown www-data:www-data -R web/
+    # find web/ -type d -exec chmod 755 {} \;
+    # find web/ -type f -exec chmod 644 {} \;
+    # chmod +x craft
 fi
 
 exec docker-php-entrypoint "$@"

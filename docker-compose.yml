@@ -19,6 +19,17 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: craft
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
+    networks:
+      - internal
+    ports:
+      - 81:80
+    environment:
+      UPLOAD_LIMIT: 100M
+
   # db2:
   #   image: postgres
   #   healthcheck:

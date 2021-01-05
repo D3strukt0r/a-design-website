@@ -1,9 +1,8 @@
 baseUrl: $DEFAULT_SITE_URL
-enabled: true
 handle: default
 hasUrls: true
-language: de
+language: de-CH
 name: a-design
 primary: true
-siteGroup: d1ce521f-7285-424a-a80d-acc59e3104f8
+siteGroup: 14ff8896-72ab-4a64-99d0-91bb7f9f82f7
 sortOrder: 1

@@ -13,7 +13,7 @@
     ],
     "require": {
         "craftcms/cms": "^3.5",
-        "craftcms/commerce": "^3.2",
+        "craftcms/commerce": "3.2.13.2",
         "vlucas/phpdotenv": "^3.4"
     },
     "require-dev": {

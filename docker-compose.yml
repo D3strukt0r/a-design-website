@@ -45,6 +45,27 @@ services:
   #     POSTGRES_PASSWORD: password
   #     POSTGRES_DB: craft
 
+  redis:
+    image: redis
+#    command: redis-server --appendonly yes --requirepass password
+    command: redis-server --appendonly yes
+    networks:
+      - internal
+    volumes:
+      - redis-data:/data
+
+  phpredisadmin:
+    image: erikdubbelboer/phpredisadmin
+    environment:
+      REDIS_1_HOST: redis
+      REDIS_1_NAME: MyRedis
+    depends_on:
+      - redis
+    networks:
+      - internal
+    ports:
+      - 82:80
+
   php:
     build:
       context: .
@@ -56,24 +77,60 @@ services:
       start_period: 1m40s
     depends_on:
       - db
+      - redis
     networks:
       - internal
     volumes:
       - .:/app:rw,cached
     environment:
+      # PHP Settings
       PHP_MAX_EXECUTION_TIME: 0
-      ENVIRONMENT: dev
+
+      # Craft general settings
       APP_ID: "CraftCMS--!justfordev!"
-      SECURITY_KEY: "!justfordev!"
+      ALLOW_UPDATES: "true"
+      ALLOW_ADMIN_CHANGES: "true"
+      BACKUP_ON_UPDATE: "false"
+      DEV_MODE: "true"
+      ENABLE_TEMPLATE_CACHING: "false"
+      ENVIRONMENT: dev # dev, staging, production
+      IS_SYSTEM_LIVE: "true"
+      RUN_QUEUE_AUTOMATICALLY: "true"
+      SECURITY_KEY: FnKtqveecwgMavLwQnX2I-dqYjpwZMR6
+
+      # Craft database settings
       # DB_DRIVER: pgsql
-      # DB_SERVER: db2
-      # DB_USER: postgres
+      # DB_SERVER: db
+      # DB_PORT: 5432
+      # DB_USER: project
+      # DB_PASSWORD: password
+      # DB_DATABASE: project
+      # DB_SCHEMA: public
+      # DB_TABLE_PREFIX:
+
       DB_DRIVER: mysql
       DB_SERVER: db
+      DB_PORT: 3306
       DB_USER: root
       DB_PASSWORD: password
       DB_DATABASE: craft
-      DEFAULT_SITE_URL: http://localhost
+      # DB_TABLE_PREFIX:
+
+      # URL & path settings
+      ASSETS_URL: http://localhost/assets
+      SITE_URL: http://localhost
+
+      # Craft & Plugin Licenses
+      # LICENSE_KEY:
+
+      # Redis settings
+      REDIS_HOSTNAME: redis
+      REDIS_PORT: 6379
+      REDIS_DEFAULT_DB: 0
+      REDIS_CRAFT_DB: 3
+
+      # Google Analytics settings
+      # GA_TRACKING_ID:
 
   nginx:
     build:
@@ -104,3 +161,4 @@ networks:
 volumes:
   database-mysql:
   # database-pgsql:
+  redis-data:

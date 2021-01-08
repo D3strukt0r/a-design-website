@@ -147,6 +147,8 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/yiisoft/yii2-queue" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/yiisoft/yii2-shell" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/yiisoft/yii2-swiftmailer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/craftcms/redactor" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/yiisoft/yii2-redis" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

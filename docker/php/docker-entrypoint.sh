@@ -4,7 +4,7 @@ set -eo pipefail
 
 # If command starts with an option (`-f` or `--some-option`), prepend main command
 if [ "${1#-}" != "$1" ]; then
-    set -- php-fpm "$@"
+    set -- php-fpm7 "$@"
 fi
 
 # Logging functions
@@ -49,7 +49,7 @@ file_env() {
 }
 
 # Setup php
-if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
+if [ "$1" = 'php-fpm7' ] || [ "$1" = 'php7' ] || [ "$1" = 'php' ]; then
     entrypoint_note 'Entrypoint script for CraftCMS started'
 
     # ----------------------------------------
@@ -64,17 +64,32 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
         PHP_MEMORY_LIMIT
         PHP_POST_MAX_SIZE
         PHP_UPLOAD_MAX_FILESIZE
+        "${manualEnvs[@]}"
+        ALLOW_UPDATES
+        ALLOW_ADMIN_CHANGES
+        BACKUP_ON_UPDATE
+        DEV_MODE
+        ENABLE_TEMPLATE_CACHING
+        ENVIRONMENT
+        IS_SYSTEM_LIVE
+        RUN_QUEUE_AUTOMATICALLY
         DB_DRIVER
         DB_SERVER
         DB_PORT
-        DB_DATABASE
         DB_USER
         DB_PASSWORD
+        DB_DATABASE
         DB_SCHEMA
         DB_TABLE_PREFIX
-        ENVIRONMENT
-        "${manualEnvs[@]}"
-        DEFAULT_SITE_URL
+        ASSETS_URL
+        SITE_URL
+        WEB_ROOT_PATH
+        LICENSE_KEY
+        REDIS_HOSTNAME
+        REDIS_PORT
+        REDIS_DEFAULT_DB
+        REDIS_CRAFT_DB
+        GA_TRACKING_ID
     )
 
     # Set empty environment variable or get content from "/run/secrets/<something>"
@@ -90,6 +105,21 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
     : "${PHP_POST_MAX_SIZE:=100M}"
     : "${PHP_UPLOAD_MAX_FILESIZE:=100M}"
 
+    # CraftCMS settings
+    # The application ID used to to uniquely store session and cache data, mutex locks, and more
+    : "${APP_ID:=}"
+    : "${ALLOW_UPDATES:=false}"
+    : "${ALLOW_ADMIN_CHANGES:=false}"
+    : "${BACKUP_ON_UPDATE:=false}"
+    : "${DEV_MODE:=false}"
+    : "${ENABLE_TEMPLATE_CACHING:=true}"
+    # The environment Craft is currently running in (dev, staging, production, etc.)
+    : "${ENVIRONMENT:=production}"
+    : "${IS_SYSTEM_LIVE:=true}"
+    : "${RUN_QUEUE_AUTOMATICALLY:=true}"
+    # The secure key Craft will use for hashing and encrypting data
+    : "${SECURITY_KEY:=}"
+
     # Database settings
     # The database driver that will be used (mysql or pgsql)
     : "${DB_DRIVER:=mysql}"
@@ -97,26 +127,34 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
     : "${DB_SERVER:=db}"
     # The port to connect to the database with
     : "${DB_PORT:=}"
-    # The name of the database to select
-    : "${DB_DATABASE:=craft}"
     # The database username to connect with
     : "${DB_USER:=root}"
     # The database password to connect with
     : "${DB_PASSWORD:=}"
+    # The name of the database to select
+    : "${DB_DATABASE:=craft}"
     # The database schema that will be used (PostgreSQL only)
     : "${DB_SCHEMA:=public}"
     # The prefix that should be added to generated table names (only necessary if multiple
     # things are sharing the same database)
     : "${DB_TABLE_PREFIX:=}"
 
-    # CraftCMS settings
-    # The environment Craft is currently running in (dev, staging, production, etc.)
-    : "${ENVIRONMENT:=prod}"
-    # The application ID used to to uniquely store session and cache data, mutex locks, and more
-    : "${APP_ID:=}"
-    # The secure key Craft will use for hashing and encrypting data
-    : "${SECURITY_KEY:=}"
-    : "${DEFAULT_SITE_URL:=}"
+    # URL & path settings
+    : "${ASSETS_URL:=http://localhost/assets}"
+    : "${SITE_URL:=http://localhost}"
+    : "${WEB_ROOT_PATH:=/app/web}"
+
+    # Craft & Plugin Licenses
+    : "${LICENSE_KEY:=}"
+
+    # Redis settings
+    : "${REDIS_HOSTNAME:=redis}"
+    : "${REDIS_PORT:=6379}"
+    : "${REDIS_DEFAULT_DB:=0}"
+    : "${REDIS_CRAFT_DB:=3}"
+
+    # Google Analytics settings
+    : "${GA_TRACKING_ID:=}"
 
     missing_manual_settings=
     for e in "${manualEnvs[@]}"; do
@@ -143,14 +181,14 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
 
     entrypoint_note 'Load/Create optimized PHP configs'
     PHP_INI_RECOMMENDED="$PHP_INI_DIR/php.ini-production"
-    if [ "$ENVIRONMENT" != 'prod' ]; then
+    if [ "$ENVIRONMENT" != 'production' ]; then
         PHP_INI_RECOMMENDED="$PHP_INI_DIR/php.ini-development"
     fi
     ln -sf "$PHP_INI_RECOMMENDED" "$PHP_INI_DIR/php.ini"
 
     {
         echo 'opcache.revalidate_freq = 0'
-        if [ "$ENVIRONMENT" = 'prod' ]; then
+        if [ "$ENVIRONMENT" = 'production' ]; then
             echo 'opcache.validate_timestamps = 0'
         fi
         echo "opcache.max_accelerated_files = $(find /app -type f -print | grep -c php)"
@@ -173,7 +211,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
 
     # ----------------------------------------
 
-    if [ "$ENVIRONMENT" != 'prod' ] && [ -f /certs/localCA.crt ]; then
+    if [ "$ENVIRONMENT" != 'production' ] && [ -f /certs/localCA.crt ]; then
         entrypoint_note 'Update CA certificates.'
         ln -sf /certs/localCA.crt /usr/local/share/ca-certificates/localCA.crt
         update-ca-certificates
@@ -181,7 +219,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
 
     # ----------------------------------------
 
-    if [ "$ENVIRONMENT" != 'prod' ]; then
+    if [ "$ENVIRONMENT" != 'production' ]; then
         entrypoint_note 'Installing libraries according to non-production environment ...'
         composer install --prefer-dist --no-interaction --no-plugins --no-scripts --no-progress --no-suggest
     fi
@@ -221,13 +259,7 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ]; then
         entrypoint_note 'The db is now ready and reachable'
     fi
 
-    # ----------------------------------------
-
-    # entrypoint_note 'Fix directory/file permissions'
-    # chown www-data:www-data -R web/
-    # find web/ -type d -exec chmod 755 {} \;
-    # find web/ -type f -exec chmod 644 {} \;
-    # chmod +x craft
+    # TODO: Check if required folders are writeable by www-data
 fi
 
-exec docker-php-entrypoint "$@"
+exec "$@"

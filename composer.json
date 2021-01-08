@@ -14,7 +14,9 @@
     "require": {
         "craftcms/cms": "^3.5",
         "craftcms/commerce": "3.2.13.2",
-        "vlucas/phpdotenv": "^3.4"
+        "craftcms/redactor": "2.8.5",
+        "vlucas/phpdotenv": "^3.4",
+        "yiisoft/yii2-redis": "^2.0"
     },
     "require-dev": {
         "codeception/codeception": "^4.1",

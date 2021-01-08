@@ -1,4 +1,4 @@
-dateModified: 1609878159
+dateModified: 1610061077
 email:
   fromEmail: info@a-design.ch
   fromName: a-design
@@ -8,12 +8,17 @@ plugins:
     edition: pro
     enabled: true
     schemaVersion: 3.2.13
+  redactor:
+    edition: standard
+    enabled: true
+    schemaVersion: 2.3.0
 system:
   edition: pro
   live: true
   name: a-design
+  retryDuration: null
   schemaVersion: 3.5.13
-  timeZone: America/Los_Angeles
+  timeZone: Europe/Zurich
 users:
   allowPublicRegistration: false
   defaultGroup: null

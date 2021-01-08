@@ -25,4 +25,34 @@ return [
         'my-module' => \modules\Module::class,
     ],
     //'bootstrap' => ['my-module'],
+    'components' => [
+        'deprecator' => [
+            'throwExceptions' => YII_DEBUG,
+        ],
+        'redis' => [
+            'class' => yii\redis\Connection::class,
+            'hostname' => App::env('REDIS_HOSTNAME'),
+            'port' => App::env('REDIS_PORT'),
+            'database' => App::env('REDIS_DEFAULT_DB'),
+        ],
+        'cache' => [
+            'class' => yii\redis\Cache::class,
+            'redis' => [
+                'hostname' => App::env('REDIS_HOSTNAME'),
+                'port' => App::env('REDIS_PORT'),
+                'database' => App::env('REDIS_CRAFT_DB'),
+            ],
+        ],
+        'session' => [
+            'class' => \yii\redis\Session::class,
+            'redis' => [
+                'hostname' => App::env('REDIS_HOSTNAME'),
+                'port' => App::env('REDIS_PORT'),
+                'database' => App::env('REDIS_CRAFT_DB'),
+            ],
+            'as session' => [
+                'class' => \craft\behaviors\SessionBehavior::class,
+            ],
+        ],
+    ],
 ];

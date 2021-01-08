@@ -1,0 +1,33 @@
+enableVersioning: true
+handle: blogPosts
+name: 'Blog Posts'
+previewTargets:
+  -
+    __assoc__:
+      -
+        - label
+        - 'Primäre eintrag Seite'
+      -
+        - urlFormat
+        - '{url}'
+      -
+        - refresh
+        - '1'
+propagationMethod: all
+siteSettings:
+  045a5a0c-ee99-45fb-beb4-591dce06ebc7:
+    enabledByDefault: true
+    hasUrls: true
+    template: blog/_entry
+    uriFormat: 'blog/{slug}'
+  1f0abb60-ffc2-4ddf-8510-9f206b8a9ef1:
+    enabledByDefault: true
+    hasUrls: true
+    template: blog/_entry
+    uriFormat: 'blog/{slug}'
+  3e84805a-e12f-40ee-875e-99175a087f49:
+    enabledByDefault: true
+    hasUrls: true
+    template: blog/_entry
+    uriFormat: 'blog/{slug}'
+type: channel

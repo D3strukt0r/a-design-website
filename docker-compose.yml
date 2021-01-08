@@ -87,7 +87,7 @@ services:
       PHP_MAX_EXECUTION_TIME: 0
 
       # Craft general settings
-      APP_ID: "CraftCMS--!justfordev!"
+      APP_ID: CraftCMS--4c262fd5-5d79-4207-9117-725a1ed4603a
       ALLOW_UPDATES: "true"
       ALLOW_ADMIN_CHANGES: "true"
       BACKUP_ON_UPDATE: "false"

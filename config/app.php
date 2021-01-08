@@ -33,23 +33,28 @@ return [
             'class' => yii\redis\Connection::class,
             'hostname' => App::env('REDIS_HOSTNAME'),
             'port' => App::env('REDIS_PORT'),
+            'password' => App::env('REDIS_PASSWORD'),
             'database' => App::env('REDIS_DEFAULT_DB'),
         ],
         'cache' => [
             'class' => yii\redis\Cache::class,
-            'redis' => [
-                'hostname' => App::env('REDIS_HOSTNAME'),
-                'port' => App::env('REDIS_PORT'),
-                'database' => App::env('REDIS_CRAFT_DB'),
-            ],
+            // 'redis' => [
+            //     'hostname' => App::env('REDIS_HOSTNAME'),
+            //     'port' => App::env('REDIS_PORT'),
+            //     'password' => App::env('REDIS_PASSWORD'),
+            //     'database' => App::env('REDIS_CRAFT_DB'),
+            // ],
+            'defaultDuration' => 86400,
+            'keyPrefix' => App::env('APP_ID') ?: 'CraftCMS',
         ],
         'session' => [
             'class' => \yii\redis\Session::class,
-            'redis' => [
-                'hostname' => App::env('REDIS_HOSTNAME'),
-                'port' => App::env('REDIS_PORT'),
-                'database' => App::env('REDIS_CRAFT_DB'),
-            ],
+            // 'redis' => [
+            //     'hostname' => App::env('REDIS_HOSTNAME'),
+            //     'port' => App::env('REDIS_PORT'),
+            //     'password' => App::env('REDIS_PASSWORD'),
+            //     'database' => App::env('REDIS_CRAFT_DB'),
+            // ],
             'as session' => [
                 'class' => \craft\behaviors\SessionBehavior::class,
             ],

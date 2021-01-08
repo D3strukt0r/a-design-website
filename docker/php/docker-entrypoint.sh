@@ -87,6 +87,7 @@ if [ "$1" = 'php-fpm7' ] || [ "$1" = 'php7' ] || [ "$1" = 'php' ]; then
         LICENSE_KEY
         REDIS_HOSTNAME
         REDIS_PORT
+        REDIS_PASSWORD
         REDIS_DEFAULT_DB
         REDIS_CRAFT_DB
         GA_TRACKING_ID
@@ -150,6 +151,7 @@ if [ "$1" = 'php-fpm7' ] || [ "$1" = 'php7' ] || [ "$1" = 'php' ]; then
     # Redis settings
     : "${REDIS_HOSTNAME:=redis}"
     : "${REDIS_PORT:=6379}"
+    : "${REDIS_PASSWORD:=}"
     : "${REDIS_DEFAULT_DB:=0}"
     : "${REDIS_CRAFT_DB:=3}"
 

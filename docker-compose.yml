@@ -1,53 +1,67 @@
 version: "3.4"
 
 services:
+  # db:
+  #   image: mariadb
+  #   command:
+  #     - --character-set-server=utf8mb4
+  #     - --collation-server=utf8mb4_unicode_ci
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "--password=password"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #   networks:
+  #     - internal
+  #   volumes:
+  #     - database-mysql:/var/lib/mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password
+  #     MYSQL_DATABASE: craft
+
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - internal
+  #   ports:
+  #     - 81:80
+  #   environment:
+  #     UPLOAD_LIMIT: 100M
+
   db:
-    image: mariadb
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
+    image: postgres
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "--password=password"]
+      test: ["CMD", "pg_isready", "--username=postgres"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
     networks:
       - internal
     volumes:
-      - database-mysql:/var/lib/mysql
+      - database-pgsql:/var/lib/postgresql/data
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: craft
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: project
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    depends_on:
-      - db
+  pgadmin:
+    image: dpage/pgadmin4
     networks:
       - internal
     ports:
       - 81:80
     environment:
-      UPLOAD_LIMIT: 100M
-
-  # db2:
-  #   image: postgres
-  #   healthcheck:
-  #     test: ["CMD", "pg_isready", "--username=postgres"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #   networks:
-  #     - internal
-  #   volumes:
-  #     - database-pgsql:/var/lib/postgresql/data
-  #   environment:
-  #     POSTGRES_PASSWORD: password
-  #     POSTGRES_DB: craft
+      PGADMIN_DEFAULT_EMAIL: admin@localhost
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - type: bind
+        source: ./docker/pgadmin_servers.json
+        target: /pgadmin4/servers.json
 
   redis:
     image: redis
-#    command: redis-server --appendonly yes --requirepass password
+    # command: redis-server --appendonly yes --requirepass password
     command: redis-server --appendonly yes
     networks:
       - internal
@@ -99,21 +113,21 @@ services:
       SECURITY_KEY: FnKtqveecwgMavLwQnX2I-dqYjpwZMR6
 
       # Craft database settings
-      # DB_DRIVER: pgsql
-      # DB_SERVER: db
-      # DB_PORT: 5432
-      # DB_USER: project
-      # DB_PASSWORD: password
-      # DB_DATABASE: project
-      # DB_SCHEMA: public
+      DB_DRIVER: pgsql
+      DB_SERVER: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_DATABASE: project
+      DB_SCHEMA: public
       # DB_TABLE_PREFIX:
 
-      DB_DRIVER: mysql
-      DB_SERVER: db
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: password
-      DB_DATABASE: craft
+      # DB_DRIVER: mysql
+      # DB_SERVER: db
+      # DB_PORT: 3306
+      # DB_USER: root
+      # DB_PASSWORD: password
+      # DB_DATABASE: craft
       # DB_TABLE_PREFIX:
 
       # URL & path settings
@@ -159,6 +173,6 @@ networks:
     external: false
 
 volumes:
-  database-mysql:
-  # database-pgsql:
+  # database-mysql:
+  database-pgsql:
   redis-data:

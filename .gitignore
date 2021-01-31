@@ -186,4 +186,12 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/linux,macos,dotenv,windows,composer,phpstorm
 
-config/license.key
+# Safer to ignore license keys
+config/license.key*
+
+docker/mysql/
+docker/pgsql/
+docker/redis/
+docker/php/www-local.ini
+docker-compose.yml
+

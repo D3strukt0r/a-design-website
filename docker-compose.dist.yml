@@ -1,63 +1,63 @@
-version: "3.4"
+version: '3.4'
 
 services:
-  # db:
-  #   image: mariadb
-  #   command:
-  #     - --character-set-server=utf8mb4
-  #     - --collation-server=utf8mb4_unicode_ci
-  #   healthcheck:
-  #     test: ["CMD", "mysqladmin", "ping", "--password=password"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 3
-  #   networks:
-  #     - internal
-  #   volumes:
-  #     - database-mysql:/var/lib/mysql
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: password
-  #     MYSQL_DATABASE: craft
-
-  # phpmyadmin:
-  #   image: phpmyadmin/phpmyadmin
-  #   depends_on:
-  #     - db
-  #   networks:
-  #     - internal
-  #   ports:
-  #     - 81:80
-  #   environment:
-  #     UPLOAD_LIMIT: 100M
-
   db:
-    image: postgres
+    image: mariadb
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD", "pg_isready", "--username=postgres"]
+      test: ["CMD", "mysqladmin", "ping", "--password=password"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
     networks:
       - internal
     volumes:
-      - database-pgsql:/var/lib/postgresql/data
+      - ./docker/mysql:/var/lib/mysql
     environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: project
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: appDb
 
-  pgadmin:
-    image: dpage/pgadmin4
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
     networks:
       - internal
     ports:
       - 81:80
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@localhost
-      PGADMIN_DEFAULT_PASSWORD: password
-    volumes:
-      - type: bind
-        source: ./docker/pgadmin_servers.json
-        target: /pgadmin4/servers.json
+      UPLOAD_LIMIT: 100M
+
+  # db:
+  #   image: postgres
+  #   healthcheck:
+  #     test: ["CMD", "pg_isready", "--username=postgres"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - internal
+  #   volumes:
+  #     - ./docker/pgsql:/var/lib/postgresql/data
+  #   environment:
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_DB: appDb
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   networks:
+  #     - internal
+  #   ports:
+  #     - 81:80
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@localhost
+  #     PGADMIN_DEFAULT_PASSWORD: password
+  #   volumes:
+  #     - type: bind
+  #       source: ./docker/pgadmin_servers.json
+  #       target: /pgadmin4/servers.json
 
   redis:
     image: redis
@@ -66,13 +66,13 @@ services:
     networks:
       - internal
     volumes:
-      - redis-data:/data
+      - ./docker/redis:/data
 
   phpredisadmin:
     image: erikdubbelboer/phpredisadmin
     environment:
       REDIS_1_HOST: redis
-      REDIS_1_NAME: MyRedis
+      REDIS_1_NAME: AppRedis
     depends_on:
       - redis
     networks:
@@ -95,40 +95,33 @@ services:
     networks:
       - internal
     volumes:
-      - .:/app:rw,cached
+      # - ./docker/php/www-local.ini:/etc/php7/php-fpm.d/www.conf:ro,cached
+      - .:/app:rw
     environment:
       # PHP Settings
       PHP_MAX_EXECUTION_TIME: 0
 
       # Craft general settings
-      APP_ID: CraftCMS--4c262fd5-5d79-4207-9117-725a1ed4603a
-      ALLOW_UPDATES: "true"
-      ALLOW_ADMIN_CHANGES: "true"
-      BACKUP_ON_UPDATE: "false"
-      DEV_MODE: "true"
-      ENABLE_TEMPLATE_CACHING: "false"
       ENVIRONMENT: dev # dev, staging, production
-      IS_SYSTEM_LIVE: "true"
-      RUN_QUEUE_AUTOMATICALLY: "true"
+      APP_ID: CraftCMS--4c262fd5-5d79-4207-9117-725a1ed4603a
       SECURITY_KEY: FnKtqveecwgMavLwQnX2I-dqYjpwZMR6
 
       # Craft database settings
-      DB_DRIVER: pgsql
-      DB_SERVER: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: password
-      DB_DATABASE: project
-      DB_SCHEMA: public
+      # DB_DRIVER: pgsql
+      # DB_SERVER: db
+      # DB_PORT: 5432
+      # DB_USER: postgres
+      # DB_PASSWORD: password
+      # DB_DATABASE: project
+      # DB_SCHEMA: public
       # DB_TABLE_PREFIX:
 
-      # DB_DRIVER: mysql
-      # DB_SERVER: db
-      # DB_PORT: 3306
-      # DB_USER: root
-      # DB_PASSWORD: password
-      # DB_DATABASE: craft
-      # DB_TABLE_PREFIX:
+      DB_DRIVER: mysql
+      DB_SERVER: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_DATABASE: appDb
 
       # URL & path settings
       ASSETS_URL: http://localhost/assets
@@ -164,15 +157,10 @@ services:
       - 80:80
       # - 443:443
     volumes:
-      - ./web:/app/web:ro
+      - ./web:/app/web:ro,cached
     # environment:
     #   USE_HTTPS: "true"
 
 networks:
   internal:
     external: false
-
-volumes:
-  # database-mysql:
-  database-pgsql:
-  redis-data:

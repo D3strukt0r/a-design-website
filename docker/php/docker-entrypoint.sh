@@ -65,14 +65,7 @@ if [ "$1" = 'php-fpm7' ] || [ "$1" = 'php7' ] || [ "$1" = 'php' ]; then
         PHP_POST_MAX_SIZE
         PHP_UPLOAD_MAX_FILESIZE
         "${manualEnvs[@]}"
-        ALLOW_UPDATES
-        ALLOW_ADMIN_CHANGES
-        BACKUP_ON_UPDATE
-        DEV_MODE
-        ENABLE_TEMPLATE_CACHING
         ENVIRONMENT
-        IS_SYSTEM_LIVE
-        RUN_QUEUE_AUTOMATICALLY
         DB_DRIVER
         DB_SERVER
         DB_PORT
@@ -109,15 +102,8 @@ if [ "$1" = 'php-fpm7' ] || [ "$1" = 'php7' ] || [ "$1" = 'php' ]; then
     # CraftCMS settings
     # The application ID used to to uniquely store session and cache data, mutex locks, and more
     : "${APP_ID:=}"
-    : "${ALLOW_UPDATES:=false}"
-    : "${ALLOW_ADMIN_CHANGES:=false}"
-    : "${BACKUP_ON_UPDATE:=false}"
-    : "${DEV_MODE:=false}"
-    : "${ENABLE_TEMPLATE_CACHING:=true}"
     # The environment Craft is currently running in (dev, staging, production, etc.)
     : "${ENVIRONMENT:=production}"
-    : "${IS_SYSTEM_LIVE:=true}"
-    : "${RUN_QUEUE_AUTOMATICALLY:=true}"
     # The secure key Craft will use for hashing and encrypting data
     : "${SECURITY_KEY:=}"
 

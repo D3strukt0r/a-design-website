@@ -1,4 +1,4 @@
-baseUrl: ''
+baseUrl: '@web/en'
 enabled: true
 handle: en
 hasUrls: true

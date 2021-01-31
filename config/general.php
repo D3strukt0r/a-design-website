@@ -11,81 +11,71 @@
 use craft\helpers\App;
 
 return [
-    // Craft config settings from .env variables
-    'aliases' => [
-        '@assetsUrl' => App::env('ASSETS_URL'),
-        '@web' => App::env('SITE_URL'),
-        '@webroot' => App::env('WEB_ROOT_PATH'),
-    ],
-    'allowUpdates' => (bool) App::env('ALLOW_UPDATES'),
-    'allowAdminChanges' => (bool) App::env('ALLOW_ADMIN_CHANGES'), // Set this to `false` to prevent administrative changes from being made
-    'backupOnUpdate' => (bool) App::env('BACKUP_ON_UPDATE'),
-    'devMode' => (bool) App::env('DEV_MODE'), // Dev Mode (see https://craftcms.com/guides/what-dev-mode-does)
-    'enableTemplateCaching' => (bool) App::env('ENABLE_TEMPLATE_CACHING'),
-    'isSystemLive' => (bool) App::env('IS_SYSTEM_LIVE'),
-    'resourceBasePath' => App::env('WEB_ROOT_PATH').'/cpresources',
-    'runQueueAutomatically' => (bool) App::env('RUN_QUEUE_AUTOMATICALLY'),
-    'securityKey' => App::env('SECURITY_KEY'), // The secure key Craft will use for hashing and encrypting data
-    'siteUrl' => [
-        'default' => '@web',
-        'en' => '@web/en',
-        'fr' => '@web/fr',
-    ],
-    // Craft config settings from constants
-    'cacheDuration' => false,
-    'cpTrigger' => 'admin', // Control panel trigger word
-    'defaultSearchTermOptions' => [
-        'subLeft' => true,
-        'subRight' => true,
-    ],
-    'defaultTokenDuration' => 'P2W',
-    'defaultWeekStartDay' => 1, // Default Week Start Day (0 = Sunday, 1 = Monday...)
-    'enableCsrfProtection' => true,
-    'errorTemplatePrefix' => 'errors/',
-    'generateTransformsBeforePageLoad' => true,
-    'maxCachedCloudImageSize' => 3000,
-    'maxUploadFileSize' => '100M',
-    'omitScriptNameInUrls' => true, // Whether generated URLs should omit "index.php"
-    'useEmailAsUsername' => false,
-    'usePathInfo' => true,
-    'useProjectConfigFile' => true,
-
     // Global settings
-    // '*' => [
-    //     // Default Week Start Day (0 = Sunday, 1 = Monday...)
-    //     'defaultWeekStartDay' => 1,
-    //
-    //     // Whether generated URLs should omit "index.php"
-    //     'omitScriptNameInUrls' => true,
-    //
-    //     // Control panel trigger word
-    //     'cpTrigger' => 'admin',
-    //
-    //     // The secure key Craft will use for hashing and encrypting data
-    //     'securityKey' => App::env('SECURITY_KEY'),
-    //
-    //     'siteUrl' => [
-    //         'default' => App::env('DEFAULT_SITE_URL'),
-    //         'en' => App::env('DEFAULT_SITE_URL').'/en',
-    //         'fr' => App::env('DEFAULT_SITE_URL').'/fr',
-    //     ],
-    // ],
+    '*' => [
+        // Any custom Yii aliases (opens new window) that should be defined for every request.
+        'aliases' => [
+            '@assetsUrl' => App::env('ASSETS_URL'),
+            '@web' => App::env('SITE_URL'),
+            '@webroot' => App::env('WEB_ROOT_PATH'),
+        ],
+        // The default length of time Craft will store data, RSS feed, and template caches.
+        'cacheDuration' => false,
+        // Control panel trigger word
+        'cpTrigger' => 'admin',
+        // The default options that should be applied to each search term.
+        'defaultSearchTermOptions' => [
+            'subLeft' => true,
+            'subRight' => true,
+        ],
+        // The default amount of time tokens can be used before expiring.
+        'defaultTokenDuration' => 'P2W',
+        // Default Week Start Day (0 = Sunday, 1 = Monday...)
+        'defaultWeekStartDay' => 1,
+        // Whether to enable CSRF protection via hidden form inputs for all forms submitted via Craft.
+        'enableCsrfProtection' => true,
+        // The prefix that should be prepended to HTTP error status codes when determining the path to look for an error’s template.
+        'errorTemplatePrefix' => 'errors/',
+        // Whether image transforms should be generated before page load.
+        'generateTransformsBeforePageLoad' => true,
+        // The maximum dimension size to use when caching images from external sources to use in transforms. Set to 0 to never cache them.
+        'maxCachedCloudImageSize' => 3000,
+        // The maximum upload file size allowed.
+        'maxUploadFileSize' => '100M',
+        // Whether generated URLs should omit "index.php"
+        'omitScriptNameInUrls' => true,
+        // The path to the root directory that should store published control panel resources.
+        'resourceBasePath' => App::env('WEB_ROOT_PATH').'/cpresources',
+        // The secure key Craft will use for hashing and encrypting data
+        'securityKey' => App::env('SECURITY_KEY'),
+        // Whether Craft should set users’ usernames to their email addresses, rather than let them set their username separately.
+        'useEmailAsUsername' => false,
+        // Whether Craft should specify the path using PATH_INFO or as a query string parameter when generating URLs.
+        'usePathInfo' => true,
+        'useProjectConfigFile' => true,
+    ],
 
     // Dev environment settings
-    // 'dev' => [
-    //     // Dev Mode (see https://craftcms.com/guides/what-dev-mode-does)
-    //     'devMode' => true,
-    // ],
+    'dev' => [
+        // Dev Mode (see https://craftcms.com/guides/what-dev-mode-does)
+        'devMode' => true,
+        // Whether to enable Craft’s template {% cache %} tag on a global basis.
+        'enableTemplateCaching' => false,
+    ],
 
     // Staging environment settings
-    // 'staging' => [
-    //     // Set this to `false` to prevent administrative changes from being made on staging
-    //     'allowAdminChanges' => false,
-    // ],
+    'staging' => [
+        // Set this to `false` to prevent administrative changes from being made on staging
+        'allowAdminChanges' => false,
+        // Whether Craft should allow system and plugin updates in the control panel, and plugin installation from the Plugin Store.
+        'allowUpdates' => false,
+    ],
 
     // Production environment settings
-    // 'production' => [
-    //     // Set this to `false` to prevent administrative changes from being made on production
-    //     'allowAdminChanges' => false,
-    // ],
+    'production' => [
+        // Set this to `false` to prevent administrative changes from being made on production
+        'allowAdminChanges' => false,
+        // Whether Craft should allow system and plugin updates in the control panel, and plugin installation from the Plugin Store.
+        'allowUpdates' => false,
+    ],
 ];

@@ -86,39 +86,13 @@ RUN set -eux; \
 # Setup PHP
 COPY docker/php/php-development.ini $PHP_INI_DIR/php.ini-development
 COPY docker/php/php-production.ini $PHP_INI_DIR/php.ini-production
+COPY docker/php/php-fpm.ini $PHP_INI_DIR/php-fpm.conf
+COPY docker/php/www.ini $PHP_INI_DIR/php-fpm.d/www.conf
 RUN set -eux; \
     \
     # Set default php configuration
     rm "$PHP_INI_DIR/php.ini"; \
     ln -s "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
-    \
-    # Setup fpm
-    sed -i 's/user = nobody/user = www-data/g' "$PHP_INI_DIR/php-fpm.d/www.conf"; \
-    sed -i 's/group = nobody/group = www-data/g' "$PHP_INI_DIR/php-fpm.d/www.conf"; \
-    { \
-        echo '[global]'; \
-        echo 'error_log = /proc/self/fd/2'; \
-        echo; \
-        echo '; https://github.com/docker-library/php/pull/725#issuecomment-443540114'; \
-        echo 'log_limit = 8192'; \
-        echo; \
-        echo '[www]'; \
-        echo '; if we send this to /proc/self/fd/1, it never appears'; \
-        echo 'access.log = /proc/self/fd/2'; \
-        echo; \
-        echo 'clear_env = no'; \
-        echo; \
-        echo '; Ensure worker stdout and stderr are sent to the main error log.'; \
-        echo 'catch_workers_output = yes'; \
-        echo 'decorate_workers_output = no'; \
-    } | tee $PHP_INI_DIR/php-fpm.d/docker.conf; \
-    { \
-        echo '[global]'; \
-        echo 'daemonize = no'; \
-        echo; \
-        echo '[www]'; \
-        echo 'listen = 9000'; \
-    } | tee $PHP_INI_DIR/php-fpm.d/zz-docker.conf; \
     \
     # Install composer
     curl -fsSL -o composer-setup.php https://getcomposer.org/installer; \
@@ -158,8 +132,7 @@ RUN set -eux; \
 
 # https://github.com/renatomefi/php-fpm-healthcheck
 RUN curl -fsSL -o /usr/local/bin/php-fpm-healthcheck https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck; \
-    chmod +x /usr/local/bin/php-fpm-healthcheck; \
-    echo 'pm.status_path = /status' >> $PHP_INI_DIR/php-fpm.d/zz-docker.conf
+    chmod +x /usr/local/bin/php-fpm-healthcheck
 HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=3 CMD php-fpm-healthcheck || exit 1
 
 # Override stop signal to stop process gracefully
